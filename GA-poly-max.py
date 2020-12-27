@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 #! /user/bin/env python3
 
@@ -8,15 +9,29 @@
 
 from struct import pack, unpack
 import struct
+=======
+#! /usr/bin/env python3
+
+import numpy
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
 import random
 import numpy
 
+<<<<<<< HEAD
+=======
+#
+
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
 # Inputs
 poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
 
 # Number of the polynomial coefs we are looking to optimize.
 n_poly_coefs = len(poly_coefs)
 
+<<<<<<< HEAD
+=======
+#
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
 
 #mating pool size and population size
 
@@ -32,23 +47,28 @@ def main():
     new_population = numpy.random.uniform(low=-1000.0, high=1000.0, size=n_pop)
     print(new_population)
     for generation in range(num_generations):
-        print("Generation : ", generation)
+        print("Generation: ", generation)
         # Calculates fitness for each person and put them in a list of
         # fitnesses
         fit_list = []
         for dude in new_population:
             dude_fitness = calc_fitness(dude)
             fit_list.append(dude_fitness)
+<<<<<<< HEAD
         print("Fitness")
         print()
         rounded_fit_list = [ round(elem, 3) for elem in fit_list]
         print(rounded_fit_list)
+=======
+        print("Fitness:")
+        print(fit_list)
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
         
-        # best_outputs.append(numpy.max(numpy.sum(new_population*equation_inputs, axis=1)))
         # The best result in the current iteration.
         max_index = numpy.argmax(fit_list)
         max_dude = new_population[max_index]
         max_fit = fit_list[max_index]
+<<<<<<< HEAD
         rounded_max_index = round(max_index, 3)
         rounded_max_dude = round(max_dude, 3)
         rounded_max_fit = round(max_fit, 3)
@@ -62,13 +82,25 @@ def main():
         print(rounded_new_population)
         print()
         print('max_ind_fit:', round(max_dude, 3), '  ', round(max_fit, 3))
+=======
+        print("Best result: ", max_index, max_dude, max_fit)
+
+        # Selecting the best parents in the population for mating.
+        new_population = select_pool(new_population, fit_list,
+                                     num_parents_mating)
 
 
+        print('---------------------------')
+        print('==== new_pop ====')
+        print(new_population)
+        print(' ')
+        print('max_ind_fit:', max_dude, '   ', max_fit)
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
+
+#
 
 def calc_fitness(x):
-    #Fitness value of each solution
     #Sum of products between each input and corresponding weight.
-    # fitness = numpy.sum(pop*equation_inputs, axis=1)
     # return fitness
     # evaluate the polynomial at the given point
     fit = 0
@@ -85,6 +117,7 @@ def select_pool(pop, fit_list, num_parents_mating):
     sorted_parent_indices = numpy.argsort(fit_list)
     top_half_parent_indices = sorted_parent_indices[-num_parents_mating:]
     top_half_parents = pop[[top_half_parent_indices]]
+<<<<<<< HEAD
     print()
     rounded_top_half_parents = [round(elem, 3) for elem in top_half_parents]
     print('top_half_parents:', rounded_top_half_parents)
@@ -92,6 +125,13 @@ def select_pool(pop, fit_list, num_parents_mating):
     child_pop = []
     for i in range(num_parents_mating // 2):
         #print('i:', i, num_parents_mating)
+=======
+    print('top_half_parents:', top_half_parents)
+    print(' ')
+    child_pop = []
+    for i in range(num_parents_mating // 2):
+#        print('i:', i, num_parents_mating)
+>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
         p1 = top_half_parents[2*i]
         p2 = top_half_parents[2*i + 1]
         c1, c2 = mate(p1, p2)
