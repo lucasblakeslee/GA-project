@@ -1,0 +1,7 @@
+2020-12-28  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: adapted the crossover function to the current
+	approach of using ieee representation of floating point numbers.
+	Also separated out two separate approaches to mating: the mate
+	that is intrinsically binary, and the one which does a simple
+	drift on the floating point values.

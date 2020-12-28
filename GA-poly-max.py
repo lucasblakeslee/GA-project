@@ -1,4 +1,4 @@
-#! /user/bin/env python3
+#! /usr/bin/env python3
 
 import numpy as np
 import random
@@ -7,6 +7,7 @@ from struct import pack, unpack
 
 import math
 from sys import exit
+import sys
 
 #
 
@@ -21,7 +22,8 @@ n_poly_coefs = len(poly_coefs)
 
 #mating pool size and population size
 
-n_pop = 8                       # number of chromosomes, or number of population members
+# number of chromosomes, or number of population members
+n_pop = 100
 assert(n_pop % 2 == 0)
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
@@ -30,7 +32,8 @@ best_outputs = []
 num_generations = 1000
 
 def main():
-    new_population = np.random.uniform(low=-1000.0, high=1000.0, size=n_pop)
+    new_population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    print(new_population)
     for generation in range(num_generations):
         print("Generation: ", generation)
         # Calculates fitness for each person and put them in a list of
@@ -38,19 +41,25 @@ def main():
         fit_list = []
         for dude in new_population:
             dude_fitness = calc_fitness(dude)
+            if math.isnan(dude_fitness):
+                dude_fitness = -sys.float_info.max
             fit_list.append(dude_fitness)
         print("Fitness:")
         print(fit_list)
-        """this needs to be refined, right now it's only checking whether the first item in the fit list is a NaN -- I tried to use the all() function but I got an error saying bools aren't iterable"""
-        if (math.isnan(fit_list[1]) == True):
-            print("something has gone horribly wrong due to hubris and wanton negligence (the program is returning NaNs)")
-            exit()
-        else:
-            pass
+        # # this needs to be refined, right now it's only checking
+        # # whether the first item in the fit list is a NaN -- I tried
+        # # to use the all() function but I got an error saying bools
+        # # aren't iterable
+        # if math.isnan(fit_list[1]) == True:
+        #     print("something has gone horribly wrong due to hubris and wanton negligence (the program is returning NaNs)")
+
+        #     exit()
+        # else:
+        #     pass
         # The best result in the current iteration.
-        max_index = np.argmax(fit_list)
-        max_dude = new_population[max_index]
-        max_fit = fit_list[max_index]
+        max_index = np.argmax(fit_list) # best dude's index
+        max_dude = new_population[max_index] # best dude
+        max_fit = fit_list[max_index]        # best dude's fitness
         print(fit_list)
         print("Best result : ", max_index, max_dude, max_fit)
         print()
@@ -59,26 +68,18 @@ def main():
         print('==== new_pop ====')
         print(new_population)
         print()
-        print('max_ind_fit:', max_dude, '  ', max_fit)
-        print("Best result: ", max_index, max_dude, max_fit)
+        print('max_dude_fit:   %d   %g   %s   %g'
+              % (max_index, max_dude, float_to_bin(max_dude), max_fit))
 
-        # Selecting the best parents in the population for mating.
-        new_population = select_pool(new_population, fit_list,
-                                     num_parents_mating)
-
-   
-
-
-#
 
 def calc_fitness(x):
-    #Sum of products between each input and corresponding weight.
-    # return fitness
-    # evaluate the polynomial at the given point
+    """evaluate the polynomial at the given point - for now that's our
+    fitness function"""
     fit = 0
     for i in range(n_poly_coefs):
         fit += poly_coefs[i] * x**i
     return fit
+
 
 def select_pool(pop, fit_list, num_parents_mating):
     """Take the population, pick out the top half of the parents, and
@@ -102,28 +103,44 @@ def select_pool(pop, fit_list, num_parents_mating):
 #        print('i:', i, num_parents_mating)
         p1 = top_half_parents[2*i]
         p2 = top_half_parents[2*i + 1]
-        c1, c2 = mate(p1, p2)
+        ## for now we have this set up so you can choose your mating
+        ## function to be mate_bitflip() or mate_drift()
+        c1, c2 = mate_bitflip(p1, p2)
+        # c1, c2 = mate_drift(p1, p2)
         child_pop.append(c1)
         child_pop.append(c2)
     new_pop = np.concatenate((child_pop, top_half_parents))
     return new_pop
 
-def mate(p1, p2):
-    """Mate two parents and get two children."""
+def mate_bitflip(p1, p2):
+    """Mate two parents and get two children; mutate the children by
+    flipping bits in the ieee binary representation of their floating
+    point values."""
+    c1, c2 = crossover(p1, p2)
+    if random.random() < 0.02:   # 10% of the time make a big shift
+        placeholder_1 = c1 + 0
+        placeholder_2 = c2 + 0
+        pos_1 = random.randint(0, 31)
+        c1 = bitflip(placeholder_1, pos_1)
+        pos_2 = random.randint(0, 31)
+        c2 = bitflip(placeholder_2, pos_2)
+    return c1, c2
+
+
+def mate_drift(p1, p2):
+    """Mate two parents and get two children; do mutations by drifting the
+    floating point value."""
     c1 = (p1 + p2) / 2.0
     c1 += (random.random() - 0.5) * 0.1
     c2 = (p1 + p2) / 2.0
     c2 += (random.random() - 0.5) * 0.1
     if random.random() < 0.1:   # 10% of the time make a big shift
-        placeholder_1 = c1 + 0
-        placeholder_2 = c2 + 0
-        pos_1 = random.randint(1, 31)
-        c1 = bitflip(placeholder_1, pos_1)
-        pos_2 = random.randint(1, 31)
-        c2 = bitflip(placeholder_2, pos_2)
+        c1 += (random.random() - 0.5) * 100.0
+        c2 += (random.random() - 0.5) * 100.0
     return c1, c2
 
-def bitflip(x,pos):
+
+def bitflip(x, pos):
     fs = pack('f',x)
     bval = list(unpack('BBBB',fs))
     [q,r] = divmod(pos,8)
@@ -132,31 +149,35 @@ def bitflip(x,pos):
     fnew=unpack('f',fs)
     return fnew[0]
 
-# def float_to_bin(num):
-#     return format(struct.unpack('!I', struct.pack('!f', num))[0], '032b')
+def float_to_bin(num):
+    """Given a float, return a string with the individual bits"""
+    result = format(struct.unpack('!I', struct.pack('!f', num))[0], '032b')
+    return result
 
-# def bin_to_float(binary):
-#     return struct.unpack('!f',struct.pack('!I', int(binary, 2)))[0]
+def bin_to_float(binary):
+    return struct.unpack('!f',struct.pack('!I', int(binary, 2)))[0]
 
 
+def crossover(p1, p2):
+    """Breed two parents into two children with crossover.  Organisms are
+    floats, and we can think of them as sequences of 32 bits in ieee
+    format."""
+    crossover_point = random.randint(0, 31)
+    p1bits = list(float_to_bin(p1))
+    p2bits = list(float_to_bin(p2))
+    c1bits = [0]*32
+    c2bits = [0]*32
+    for k in range(0, crossover_point):
+        c1bits[k] = p1bits[k]
+        c2bits[k] = p2bits[k]
+    for k in range(crossover_point, 32):
+        c1bits[k] = p2bits[k]
+        c2bits[k] = p1bits[k]
+        
+    c1 = bin_to_float(''.join(c1bits))
+    c2 = bin_to_float(''.join(c2bits))
+    return c1, c2
 
-"""
-====================HAS NO IMPACT, NEEDS TO BE INCORPORATED===========================
-
-def crossover(parents, offspring_size):
-   offspring = np.empty(offspring_size)
-   crossover_point = np.uint8(offspring_size[1]/2)
-
-   for k in range(offspring_size[0]):
-#        Index of the first parent to mate.
-       parent1_idx = k%parents.shape[0]
-#        Index of the second parent to mate.
-       parent2_idx = (k+1)%parents.shape[0]
-#        The new offspring will have its first half of its genes taken from the first parent.
-       offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
-#        The new offspring will have its second half of its genes taken from the second parent.
-       offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
-       return offspring
 
 def mutation(offspring_crossover, num_mutations=1):
 # Mutation changes a single gene in each offspring randomly.
@@ -168,16 +189,31 @@ def mutation(offspring_crossover, num_mutations=1):
            random_value = np.random.uniform(-1.0, 1.0, 1)
            offspring_crossover[idx, mutation_index] = offspring_crossover[idx, mutation_index] + random_value
    return offspring_crossover
-"""
-main()
 
-###############################
-# Iteration vs. Fitness
 
-#import matplotlib.pyplot
-#matplotlib.pyplot.plot(best_outputs)
-#matplotlib.pyplot.xlabel("Iteration")
-#matplotlib.pyplot.ylabel("Fitness")
-#matplotlib.pyplot.show()
+def make_plots(best_outputs):
+    # Iteration vs. Fitness
+    import matplotlib.pyplot
+    matplotlib.pyplot.plot(best_outputs)
+    matplotlib.pyplot.xlabel("Iteration")
+    matplotlib.pyplot.ylabel("Fitness")
+    matplotlib.pyplot.show()
 
-#>>>>>>> 3745daad59442e2f2eab895314a63d73f9a6b525
+def run_tests():
+    # test the bitflip routine on a given number
+    x = 2.4
+    y = bitflip(x, 12)
+    print(x, y)
+    print(float_to_bin(x))
+    print(float_to_bin(y))
+    xbits = list(float_to_bin(x))
+    print('bitlist:', xbits)
+    xstr = ''.join(xbits)
+    print('from_bitlist_to_str:', xstr)
+    x_after_processing = bin_to_float(xstr)
+    print('from_str_to_float:', x_after_processing)
+
+
+run_tests()
+if __name__ == '__main__':
+    main()
