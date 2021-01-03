@@ -218,7 +218,9 @@ def run_tests():
 
 def print_metadata():
     """Print some information about the run using the "low effort
-    metadata" approach."""
+    metadata" approach, described at
+    https://programmingforresearch.wordpress.com/2020/06/07/low-effort-metadata-lem/
+    """
     from datetime import datetime
     my_date = datetime.now()
     dt_str = my_date.isoformat()
