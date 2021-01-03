@@ -1,3 +1,17 @@
+2021-01-02  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py (main): structured this main() function to have a
+	simple flow of advancing one generation.  The main loop is now tiny.
+	(advance_one_generation): new function to handle each generation.
+	(print_pop_stats): new function which takes on the functionality
+	of printing the fitness status at this point.
+	(calc_pop_fitness): new function which calculates the fitness of
+	the entire population.
+	(print_pop): new function, not used right now, which prints out
+	the current population.
+	(print_metadata): new function which prints a starting metadata
+	block for the program.
+
 2020-12-28  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: adapted the crossover function to the current

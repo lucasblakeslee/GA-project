@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 
 import numpy as np
 import random
@@ -18,9 +18,7 @@ poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
 n_poly_coefs = len(poly_coefs)
 
 
-#
-
-#mating pool size and population size
+# mating pool size and population size
 
 # number of chromosomes, or number of population members
 n_pop = 100
@@ -32,44 +30,47 @@ best_outputs = []
 num_generations = 1000
 
 def main():
-    new_population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    print(new_population)
-    for generation in range(num_generations):
-        print("Generation: ", generation)
-        # Calculates fitness for each person and put them in a list of
-        # fitnesses
-        fit_list = []
-        for dude in new_population:
-            dude_fitness = calc_fitness(dude)
-            if math.isnan(dude_fitness):
-                dude_fitness = -sys.float_info.max
-            fit_list.append(dude_fitness)
-        print("Fitness:")
-        print(fit_list)
-        # # this needs to be refined, right now it's only checking
-        # # whether the first item in the fit list is a NaN -- I tried
-        # # to use the all() function but I got an error saying bools
-        # # aren't iterable
-        # if math.isnan(fit_list[1]) == True:
-        #     print("something has gone horribly wrong due to hubris and wanton negligence (the program is returning NaNs)")
+    population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    # print_pop(0, population)
+    print_metadata()
+    for gen in range(num_generations):
+        new_pop = advance_one_generation(gen, population)
+        population = new_pop
 
-        #     exit()
-        # else:
-        #     pass
-        # The best result in the current iteration.
-        max_index = np.argmax(fit_list) # best dude's index
-        max_dude = new_population[max_index] # best dude
-        max_fit = fit_list[max_index]        # best dude's fitness
-        print(fit_list)
-        print("Best result : ", max_index, max_dude, max_fit)
-        print()
-        # Selecting the best parents in the population for mating.
-        new_population = select_pool(new_population, fit_list, num_parents_mating)
-        print('==== new_pop ====')
-        print(new_population)
-        print()
-        print('max_dude_fit:   %d   %g   %s   %g'
-              % (max_index, max_dude, float_to_bin(max_dude), max_fit))
+
+def advance_one_generation(gen, pop):
+    """Calculates fitness for each person and return them in a list."""
+    fit_list = calc_pop_fitness(pop)
+    print_pop_stats(gen, pop, fit_list)
+    # Selecting the best parents in the population for mating.
+    new_pop = select_pool(pop, fit_list, num_parents_mating)
+    return new_pop
+
+def print_pop_stats(gen, pop, fit_list):
+    """Print useful bits of info about the current population list."""
+    # print("fitness_list:", fit_list)
+    # The best result in the current iteration.
+    max_index = np.argmax(fit_list) # best dude's index
+    max_dude = pop[max_index] # best dude
+    max_fit = fit_list[max_index]        # best dude's fitness
+    avg_fit = np.mean(fit_list)
+    elite_avg_fit = np.mean(fit_list[:len(fit_list)//2])
+    # print(fit_list)
+    # print("best_result:", max_index, max_dude, max_fit)
+    print(f'max_dude_fit:   {max_index}   {max_dude}   {float_to_bin(max_dude)}'
+          + f'   {max_fit}   {elite_avg_fit}   {avg_fit}')
+
+
+def calc_pop_fitness(pop):
+    """Calculates the fitnesses of each member of a population and returns
+    a list with all of them."""
+    fit_list = []
+    for dude in pop:
+        dude_fitness = calc_fitness(dude)
+        if math.isnan(dude_fitness):
+            dude_fitness = -sys.float_info.max
+        fit_list.append(dude_fitness)
+    return fit_list
 
 
 def calc_fitness(x):
@@ -90,14 +91,12 @@ def select_pool(pop, fit_list, num_parents_mating):
     sorted_parent_indices = np.argsort(fit_list)
     top_half_parent_indices = sorted_parent_indices[-num_parents_mating:]
     top_half_parents = pop[[top_half_parent_indices]]
-    print()
-    print('top_half_parents:', top_half_parents)
-    print()
+    # print('top_half_parents:', top_half_parents)
     child_pop = []
-    for i in range(num_parents_mating // 2):
-        #print('i:', i, num_parents_mating)
-        print('top_half_parents:', top_half_parents)
-        print(' ')
+    # for i in range(num_parents_mating // 2):
+    #     #print('i:', i, num_parents_mating)
+    #     print('top_half_parents:', top_half_parents)
+    #     print(' ')
     child_pop = []
     for i in range(num_parents_mating // 2):
 #        print('i:', i, num_parents_mating)
@@ -199,6 +198,10 @@ def make_plots(best_outputs):
     matplotlib.pyplot.ylabel("Fitness")
     matplotlib.pyplot.show()
 
+def print_pop(gen, pop):
+    print(f'# population at generation {gen}')
+    print(pop)
+
 def run_tests():
     # test the bitflip routine on a given number
     x = 2.4
@@ -213,7 +216,27 @@ def run_tests():
     x_after_processing = bin_to_float(xstr)
     print('from_str_to_float:', x_after_processing)
 
+def print_metadata():
+    """Print some information about the run using the "low effort
+    metadata" approach."""
+    from datetime import datetime
+    my_date = datetime.now()
+    dt_str = my_date.isoformat()
+    print(f"""##COMMENT: Genetic algorithm run
+##COMMAND_LINE: {sys.argv.__str__()}
+##RUN_DATETIME: {dt_str}
+##POLY_COEFS: {poly_coefs.__str__()}
+##N_POP: {n_pop}
+##N_GENERATIONS: {num_generations}
+##COLUMN0: constant string max_dude_fit:
+##COLUMN1: index of max fitness
+##COLUMN2: fittest member
+##COLUMN3: fittest member bitstring
+##COLUMN4: highest fitness
+##COLUMN5: elite average fitness
+##COLUMN6: average fitness""")
 
-run_tests()
+
+# run_tests()
 if __name__ == '__main__':
     main()
