@@ -125,6 +125,13 @@ def mate_bitflip(p1, p2):
         c2 = bitflip(placeholder_2, pos_2)
     return c1, c2
 
+def calc_genetic_distance(p1, p2):
+    a = float_to_bin(p1)
+    b = float_to_bin(p2)
+    array_p1 = bytearray(a, 'utf-8')
+    array_p2 = bytearray(b, 'utf-8')
+    genetic_distance = np.sum(np.bitwise_xor(array_p1,array_p2))
+    return genetic_distance
 
 def mate_drift(p1, p2):
     """Mate two parents and get two children; do mutations by drifting the
@@ -155,8 +162,7 @@ def float_to_bin(num):
 
 def bin_to_float(binary):
     return struct.unpack('!f',struct.pack('!I', int(binary, 2)))[0]
-
-
+    
 def crossover(p1, p2):
     """Breed two parents into two children with crossover.  Organisms are
     floats, and we can think of them as sequences of 32 bits in ieee
@@ -176,6 +182,7 @@ def crossover(p1, p2):
     c1 = bin_to_float(''.join(c1bits))
     c2 = bin_to_float(''.join(c2bits))
     return c1, c2
+
 
 
 def mutation(offspring_crossover, num_mutations=1):
@@ -242,3 +249,61 @@ def print_metadata():
 # run_tests()
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+insert an analysis function that dumps out some more
+statistical quantities
+
+define a stability difference, the extent to which
+genetic difference leads to fitness difference
+
+
+track lineage and make phylogenetic trees
+
+because we know everything we can save everything to
+a file and hopefully have enough information to track
+evolution
+
+
+we picked random coefficients for our polynomial, one
+of the results of which is that all the action happens
+pretty close to zero but if you plot a small polynomial
+you don't have a clear insight about where the zeroes
+are, but if you plotted something like:
+(x-1000)*(x+20000)*(x+1e6)*(x+1e8)
+you have to have a very large range [-1e8:1e8] and then
+you can see all the zero crossings and all the interesting
+regions will be in drastically varying places
+
+for genetic distance it might be prudent to differentiate
+between the mantissa, signficand, and sign (two dudes with
+a different sign will be more distant from each other than
+two with the last bit flipped)
+"""
