@@ -1,3 +1,10 @@
+2021-01-19  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py (calc_entropy): introduced a preliminary function
+	which calculates the shannon entropy for the population by looking
+	at the occupancy of each state in the population.
+	(print_pop_stats): added a printing of the shannon entropy.
+
 2021-01-02  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py (main): structured this main() function to have a

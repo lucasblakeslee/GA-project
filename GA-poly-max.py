@@ -30,7 +30,11 @@ best_outputs = []
 num_generations = 1000
 
 def main():
-    population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    population = np.random.uniform(low=100000.0000000001, 
+                                   high=100000.0000000002,
+                                   size=n_pop)
+    print_pop(0, population)
     # print_pop(0, population)
     print_metadata()
     for gen in range(num_generations):
@@ -55,10 +59,11 @@ def print_pop_stats(gen, pop, fit_list):
     max_fit = fit_list[max_index]        # best dude's fitness
     avg_fit = np.mean(fit_list)
     elite_avg_fit = np.mean(fit_list[:len(fit_list)//2])
+    entropy = calc_entropy(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     print(f'max_dude_fit:   {max_index}   {max_dude}   {float_to_bin(max_dude)}'
-          + f'   {max_fit}   {elite_avg_fit}   {avg_fit}')
+          + f'   {max_fit}   {elite_avg_fit}   {avg_fit}    {entropy}')
 
 
 def calc_pop_fitness(pop):
@@ -132,6 +137,31 @@ def calc_genetic_distance(p1, p2):
     array_p2 = bytearray(b, 'utf-8')
     genetic_distance = np.sum(np.bitwise_xor(array_p1,array_p2))
     return genetic_distance
+
+
+def calc_entropy(gen, pop):
+    """Calculate the shannon entropy for this population by applying the
+    Shannon formula using occupancy of each state in the population."""
+    pop_unique = list(set(pop))
+    n_species = len(pop_unique)
+    occupancy = [0]*n_species
+    for member in pop:
+        # find the index of this member in the list of species
+        occ_index = pop_unique.index(member)
+        occupancy[occ_index] += 1
+    shannon_entropy = 0
+    for i in range(len(occupancy)):
+        # prob = occupancy[occ_index] / n_species
+        prob = occupancy[occ_index] / n_pop
+        # if prob == 0:
+        #     individual_surprise = 0
+        # else:
+        individual_surprise = -prob * math.log(prob)
+        shannon_entropy += individual_surprise
+    # print_pop(gen, pop)
+    # # print(pop)
+    return shannon_entropy
+
 
 def mate_drift(p1, p2):
     """Mate two parents and get two children; do mutations by drifting the
@@ -207,7 +237,10 @@ def make_plots(best_outputs):
 
 def print_pop(gen, pop):
     print(f'# population at generation {gen}')
-    print(pop)
+    # print(pop)
+    for i, member in enumerate(pop):
+        bit_str = float_to_bin(member)
+        print(i, bit_str, '%20.12f' % member)
 
 def run_tests():
     # test the bitflip routine on a given number
