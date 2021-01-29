@@ -20,7 +20,7 @@ import os
 # polynomial coefficients.  it has to be even degree (i.e. list has to
 # have odd length), and last (most significant) coefficient has to be
 # negative so that it has a peak
-poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3, 2, -2]
+poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
 
 # Number of the polynomial coefs we are looking to optimize.
 n_poly_coefs = len(poly_coefs)
@@ -29,7 +29,7 @@ n_poly_coefs = len(poly_coefs)
 # mating pool size and population size
 
 # number of chromosomes, or number of population members
-n_pop = 1000
+n_pop = 200
 assert(n_pop % 2 == 0)
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
@@ -42,14 +42,14 @@ def main():
     # NOTE: you can force the seed to get reproducible runs.  comment
     # the random.seed() call to get different runs each time.
     random.seed(12345)
-    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
     # population = np.random.uniform(low=100000.0000000001, 
     #                                high=100000.0000000002,
     #                                size=n_pop)
-    population = np.random.uniform(low=-200000.0000000001, 
-                                   # high=100000.0000000002,
-                                   high=-100000.0000000002,
-                                   size=n_pop)
+    # population = np.random.uniform(low=-200000.0000000001, 
+    #                                # high=100000.0000000002,
+    #                                high=-100000.0000000002,
+    #                                size=n_pop)
     print_pop(0, population)
     # print_pop(0, population)
     print_metadata()
@@ -61,12 +61,27 @@ def main():
     print(f'# wrote generation information to {get_gen_info_fname()}')
     print('# you could make plots with:')
     gen_fname = get_gen_info_fname()
-    cmds = (f"gnuplot -e 'set multiplot layout 2, 1'"
-            + f""" -e 'set title "evolution_pid{os.getpid()}"' """
-            + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 3" '''
-            + f''' -e "plot '{gen_fname}' using 2:9 with lines lw 3" '''
-            + f""" -e "pause -1" """)
-    print(cmds)
+    for interactive in (True, False):
+        cmd = ("gnuplot"
+               + (f""" -e 'set terminal pdf' """
+                  + f""" -e 'set output "{gen_fname}.pdf"' """
+                  if not interactive else "")
+               + f" -e 'set grid'"
+               # + f" -e 'set multiplot layout 2, 1'"
+               + f""" -e 'set title "EvolutionPID{os.getpid()}"' """
+               # + f""" -e 'set logscale y' """
+               + f""" -e 'set ytics autofreq' """
+               + f""" -e 'set ylabel "fitness"' """
+               + f""" -e 'set y2tics autofreq' """
+               + f""" -e 'set y2label "entropy"' """
+               + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 2 axes x1y1 title 'fitness' '''
+               + f'''     , '{gen_fname}' using 2:9 with lines lw 1 axes x1y2 title 'entropy'" '''
+               + (f""" -e "pause -1" """ if interactive else "")
+               )
+        print(f'# {("NON" if not interactive else "")} interactive')
+        print(cmd)
+        os.system(cmd + ' &')
+    os.system(f'evince {gen_fname}.pdf &')
 
 
 def advance_one_generation(gen, pop):
@@ -92,7 +107,7 @@ def print_pop_stats(gen, pop, fit_list):
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude}'
                      + f'   {float_to_bin(max_dude)}   {max_fit}'
                      + f'   {elite_avg_fit}   {avg_fit}    {entropy}')
-    print(line_to_print)
+    print(line_to_print + '   ')
     with open(get_gen_info_fname(), 'a') as f:
         f.write(line_to_print + '\n')
 
@@ -120,7 +135,7 @@ def calc_fitness(x):
     for i in range(n_poly_coefs):
         fit += poly_coefs[i] * x**i
     # now multiply by a gaussian envelope
-    fit = fit * math.exp(-x**2 / 100.0)
+    # fit = fit * math.exp(-x**2 / 100.0)
     return fit
 
 
@@ -158,7 +173,7 @@ def mate_bitflip(p1, p2):
     flipping bits in the ieee binary representation of their floating
     point values."""
     c1, c2 = crossover(p1, p2)
-    if random.random() < 0.02:   # 10% of the time make a big shift
+    if random.random() < 0.1:   # a small % of the time make a big shift
         placeholder_1 = c1 + 0
         placeholder_2 = c2 + 0
         pos_1 = random.randint(0, 31)
@@ -214,6 +229,7 @@ def calc_entropy(gen, pop):
             occ_index = pop_unique.index(math.nan)
         else:
             occ_index = pop_unique.index(member)
+        # occ_index = pop_unique.index(member)
         occupancy[occ_index] += 1
     shannon_entropy = 0
     for i in range(len(occupancy)):

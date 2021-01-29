@@ -1,4 +1,14 @@
+2021-01-29  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: improved the plotting to allow separate y axes
+	for fitness and entropy.
+
 2021-01-28  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: further improvements in the user friendly
+	plotting.  Plot instructions are now invoked with os.system() so
+	that gnuplot makes a .pdf file, and a PDF viewer comes up with the
+	plot.
 
 	* GA-poly-max.py: added some convenience generating of output
 	files with plot information, and started adding (not yet debugged)
