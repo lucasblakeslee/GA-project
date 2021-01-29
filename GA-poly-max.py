@@ -61,9 +61,10 @@ def main():
     print(f'# wrote generation information to {get_gen_info_fname()}')
     print('# you could make plots with:')
     gen_fname = get_gen_info_fname()
-    cmds = (f"gnuplot -e 'set multiplot layout 2, 1' "
-            + f" title 'evolution_pid{os.getpid()}' "
-            + f""" -e "plot '{gen_fname}' using 2:6 with lines lw 3"""
+    cmds = (f"gnuplot -e 'set multiplot layout 2, 1'"
+            + f""" -e 'set title "evolution_pid{os.getpid()}"' """
+            + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 3" '''
+            + f''' -e "plot '{gen_fname}' using 2:9 with lines lw 3" '''
             + f""" -e "pause -1" """)
     print(cmds)
 
