@@ -1,3 +1,9 @@
+2021-01-28  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: added some convenience generating of output
+	files with plot information, and started adding (not yet debugged)
+	notes about how to make a plot.
+
 2021-01-19  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py (calc_entropy): introduced a preliminary function

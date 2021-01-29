@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""Evolves a genetic algorithm that looks for the max of a polynomial
+by flipping bits in the ieee binary representation of a floating point
+number.
+"""
+
 import numpy as np
 import random
 import struct
@@ -8,11 +13,14 @@ from struct import pack, unpack
 import math
 from sys import exit
 import sys
+import os
 
 #
 
-# Inputs
-poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
+# polynomial coefficients.  it has to be even degree (i.e. list has to
+# have odd length), and last (most significant) coefficient has to be
+# negative so that it has a peak
+poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3, 2, -2]
 
 # Number of the polynomial coefs we are looking to optimize.
 n_poly_coefs = len(poly_coefs)
@@ -21,7 +29,7 @@ n_poly_coefs = len(poly_coefs)
 # mating pool size and population size
 
 # number of chromosomes, or number of population members
-n_pop = 100
+n_pop = 1000
 assert(n_pop % 2 == 0)
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
@@ -30,9 +38,17 @@ best_outputs = []
 num_generations = 1000
 
 def main():
+    print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
+    # NOTE: you can force the seed to get reproducible runs.  comment
+    # the random.seed() call to get different runs each time.
+    random.seed(12345)
     # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    population = np.random.uniform(low=100000.0000000001, 
-                                   high=100000.0000000002,
+    # population = np.random.uniform(low=100000.0000000001, 
+    #                                high=100000.0000000002,
+    #                                size=n_pop)
+    population = np.random.uniform(low=-200000.0000000001, 
+                                   # high=100000.0000000002,
+                                   high=-100000.0000000002,
                                    size=n_pop)
     print_pop(0, population)
     # print_pop(0, population)
@@ -40,6 +56,16 @@ def main():
     for gen in range(num_generations):
         new_pop = advance_one_generation(gen, population)
         population = new_pop
+
+    print(f'# wrote fitness plot data to fit_func_pid{os.getpid()}.out')
+    print(f'# wrote generation information to {get_gen_info_fname()}')
+    print('# you could make plots with:')
+    gen_fname = get_gen_info_fname()
+    cmds = (f"gnuplot -e 'set multiplot layout 2, 1' "
+            + f" title 'evolution_pid{os.getpid()}' "
+            + f""" -e "plot '{gen_fname}' using 2:6 with lines lw 3"""
+            + f""" -e "pause -1" """)
+    print(cmds)
 
 
 def advance_one_generation(gen, pop):
@@ -62,9 +88,15 @@ def print_pop_stats(gen, pop, fit_list):
     entropy = calc_entropy(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
-    print(f'max_dude_fit:   {max_index}   {max_dude}   {float_to_bin(max_dude)}'
-          + f'   {max_fit}   {elite_avg_fit}   {avg_fit}    {entropy}')
+    line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude}'
+                     + f'   {float_to_bin(max_dude)}   {max_fit}'
+                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}')
+    print(line_to_print)
+    with open(get_gen_info_fname(), 'a') as f:
+        f.write(line_to_print + '\n')
 
+def get_gen_info_fname():
+    return f'GA-gen-info_pid{os.getpid()}.out'
 
 def calc_pop_fitness(pop):
     """Calculates the fitnesses of each member of a population and returns
@@ -80,10 +112,14 @@ def calc_pop_fitness(pop):
 
 def calc_fitness(x):
     """evaluate the polynomial at the given point - for now that's our
-    fitness function"""
+    fitness function.  sometimes we also multiply it by a wide
+    gaussian envelope to avoid fitness values that are too extreme
+    """
     fit = 0
     for i in range(n_poly_coefs):
         fit += poly_coefs[i] * x**i
+    # now multiply by a gaussian envelope
+    fit = fit * math.exp(-x**2 / 100.0)
     return fit
 
 
@@ -142,20 +178,45 @@ def calc_genetic_distance(p1, p2):
 def calc_entropy(gen, pop):
     """Calculate the shannon entropy for this population by applying the
     Shannon formula using occupancy of each state in the population."""
+    # print('pop:')
+    # print_pop(gen, pop)
     pop_unique = list(set(pop))
+    # now collapse all NANs (numbers that satisfy math.isnan(x)) into
+    # the single math.nan value.  this way the pop_unique.index() call
+    # will work correctly
+    # print('pop_unique:')
+    # print_pop(gen, pop_unique)
+    pop_unique = [math.nan if math.isnan(x) else x for x in pop_unique]
+    # print('pop_unique:')
+    # print_pop(gen, pop_unique)
     n_species = len(pop_unique)
     occupancy = [0]*n_species
+    # our approach to calculating entropy is to form an "occupancy"
+    # histogram: how many population members are in each possible bit
+    # configuration.  Then we use Shannon's -Sum(p_i*log(p_i))
+    # formula, where p_i is the occupancy fraction for each state.
     for member in pop:
-        # find the index of this member in the list of species
-        occ_index = pop_unique.index(member)
+        # find the index of this member in the list of species.  we
+        # use a special treatment for NANs, since comparing them is
+        # not well defined (there are several values that are NAN).
+        # to understand this try the following:
+        # In [22]: x = bin_to_float('01111111110000000000000000000000')
+        # In [23]: y = bin_to_float('01111111110000000000010000000000')
+        # In [24]: x == y
+        # Out[24]: False
+        # In [25]: math.isnan(x)
+        # Out[25]: True
+        # In [26]: math.isnan(y)
+        # Out[26]: True
+        # print('ABOUT:', member, pop_unique)
+        if math.isnan(member):
+            occ_index = pop_unique.index(math.nan)
+        else:
+            occ_index = pop_unique.index(member)
         occupancy[occ_index] += 1
     shannon_entropy = 0
     for i in range(len(occupancy)):
-        # prob = occupancy[occ_index] / n_species
         prob = occupancy[occ_index] / n_pop
-        # if prob == 0:
-        #     individual_surprise = 0
-        # else:
         individual_surprise = -prob * math.log(prob)
         shannon_entropy += individual_surprise
     # print_pop(gen, pop)
@@ -192,7 +253,7 @@ def float_to_bin(num):
 
 def bin_to_float(binary):
     return struct.unpack('!f',struct.pack('!I', int(binary, 2)))[0]
-    
+
 def crossover(p1, p2):
     """Breed two parents into two children with crossover.  Organisms are
     floats, and we can think of them as sequences of 32 bits in ieee
@@ -271,42 +332,26 @@ def print_metadata():
 ##N_POP: {n_pop}
 ##N_GENERATIONS: {num_generations}
 ##COLUMN0: constant string max_dude_fit:
-##COLUMN1: index of max fitness
-##COLUMN2: fittest member
-##COLUMN3: fittest member bitstring
-##COLUMN4: highest fitness
-##COLUMN5: elite average fitness
-##COLUMN6: average fitness""")
+##COLUMN1: generation number
+##COLUMN2: index of max fitness
+##COLUMN3: fittest member
+##COLUMN4: fittest member bitstring
+##COLUMN5: highest fitness
+##COLUMN6: elite average fitness
+##COLUMN7: average fitness
+##COLUMN8: population entroypy""")
 
+def print_poly_for_plot(fname):
+    x = -1000
+    with open(fname, 'w') as f:
+        while x <= 1000:
+            f.write(f'fit_plot:   {x}   {calc_fitness(x)}\n')
+            x += 0.1
+    print(f'# wrote function info to {fname}')
 
 # run_tests()
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
