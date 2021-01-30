@@ -15,8 +15,6 @@ from sys import exit
 import sys
 import os
 
-#
-
 # polynomial coefficients.  it has to be even degree (i.e. list has to
 # have odd length), and last (most significant) coefficient has to be
 # negative so that it has a peak
@@ -29,7 +27,7 @@ n_poly_coefs = len(poly_coefs)
 # mating pool size and population size
 
 # number of chromosomes, or number of population members
-n_pop = 200
+n_pop = 100
 assert(n_pop % 2 == 0)
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
@@ -42,10 +40,11 @@ def main():
     # NOTE: you can force the seed to get reproducible runs.  comment
     # the random.seed() call to get different runs each time.
     random.seed(12345)
-    population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    # population = np.random.uniform(low=100000.0000000001, 
-    #                                high=100000.0000000002,
+    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    # population = np.random.uniform(low=-100000.0000000002, 
+    #                                high=-100000.0000000001,
     #                                size=n_pop)
+    population = np.full(n_pop, -1.78e9)
     # population = np.random.uniform(low=-200000.0000000001, 
     #                                # high=100000.0000000002,
     #                                high=-100000.0000000002,
@@ -82,6 +81,29 @@ def main():
         print(cmd)
         os.system(cmd + ' &')
     os.system(f'evince {gen_fname}.pdf &')
+    print('# and you can plot the function with:')
+    func_fname = f'fit-func_pid{os.getpid()}.out'
+    for interactive in (True, False):
+        cmd = ("gnuplot"
+               + (f""" -e 'set terminal pdf' """
+                  + f""" -e 'set output "{func_fname}.pdf"' """
+                  if not interactive else "")
+               + f" -e 'set grid'"
+               + f""" -e 'set title "FunctionPID{os.getpid()}"' """
+               # + f""" -e 'set logscale y' """
+               # + f""" -e 'set ytics autofreq' """
+               + f""" -e 'set xlabel "x"' """
+               + f""" -e 'set ylabel "fitness(x)"' """
+               # + f""" -e 'set y2tics autofreq' """
+               # + f""" -e 'set y2label "entropy"' """
+               + f''' -e "plot '{func_fname}' using 2:3 with lines lw 2 title 'fitness'" '''
+               + (f""" -e "pause -1" """ if interactive else "")
+               )
+        print(f'# {("NON" if not interactive else "")} interactive')
+        print(cmd)
+    os.system(cmd + ' &')
+    os.system(f'evince {func_fname}.pdf &')
+
 
 
 def advance_one_generation(gen, pop):
@@ -101,12 +123,12 @@ def print_pop_stats(gen, pop, fit_list):
     max_fit = fit_list[max_index]        # best dude's fitness
     avg_fit = np.mean(fit_list)
     elite_avg_fit = np.mean(fit_list[:len(fit_list)//2])
-    entropy = calc_entropy(gen, pop)
+    entropy, occupancy = calc_entropy(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude}'
                      + f'   {float_to_bin(max_dude)}   {max_fit}'
-                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}')
+                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {occupancy}')
     print(line_to_print + '   ')
     with open(get_gen_info_fname(), 'a') as f:
         f.write(line_to_print + '\n')
@@ -131,11 +153,13 @@ def calc_fitness(x):
     fitness function.  sometimes we also multiply it by a wide
     gaussian envelope to avoid fitness values that are too extreme
     """
-    fit = 0
-    for i in range(n_poly_coefs):
-        fit += poly_coefs[i] * x**i
-    # now multiply by a gaussian envelope
-    # fit = fit * math.exp(-x**2 / 100.0)
+    # fit = 0
+    # for i in range(n_poly_coefs):
+    #     fit += poly_coefs[i] * x**i
+    # # now multiply by a gaussian envelope
+    # # fit = fit * math.exp(-x**2 / 100.0)
+    # fit = math.cos(x-40)+10*math.exp(-(x-40)**2/5000)
+    fit = math.sin((x-40)/2) + 10*math.exp(-(x-40)**2/5000)
     return fit
 
 
@@ -238,7 +262,7 @@ def calc_entropy(gen, pop):
         shannon_entropy += individual_surprise
     # print_pop(gen, pop)
     # # print(pop)
-    return shannon_entropy
+    return shannon_entropy, occupancy
 
 
 def mate_drift(p1, p2):
