@@ -1,3 +1,8 @@
+2021-01-31  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: adjusted parameters so that we get an evolution
+	rich enough to start drawing conclusions on how it works.
+
 2021-01-29  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: improved the plotting to allow separate y axes

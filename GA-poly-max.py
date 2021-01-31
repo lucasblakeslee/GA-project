@@ -9,11 +9,12 @@ import numpy as np
 import random
 import struct
 from struct import pack, unpack
-
 import math
 from sys import exit
 import sys
 import os
+
+import matplotlib.pyplot as plt
 
 # polynomial coefficients.  it has to be even degree (i.e. list has to
 # have odd length), and last (most significant) coefficient has to be
@@ -24,31 +25,25 @@ poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
 n_poly_coefs = len(poly_coefs)
 
 
-# mating pool size and population size
-
-# number of chromosomes, or number of population members
-n_pop = 100
+## parameters of the run
+# set run_seed to an int to force a seed (and get a reproducible run),
+# or None to have a different random sequence eacth time
+random_seed = 123456
+n_pop = 10000
 assert(n_pop % 2 == 0)
+mutation_rate = 0.3
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
+num_generations = 200
 
 best_outputs = []
-num_generations = 1000
 
 def main():
     print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.  comment
     # the random.seed() call to get different runs each time.
-    random.seed(12345)
-    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    # population = np.random.uniform(low=-100000.0000000002, 
-    #                                high=-100000.0000000001,
-    #                                size=n_pop)
-    population = np.full(n_pop, -1.78e9)
-    # population = np.random.uniform(low=-200000.0000000001, 
-    #                                # high=100000.0000000002,
-    #                                high=-100000.0000000002,
-    #                                size=n_pop)
+    random.seed(random_seed)
+    population = make_initial_pop(n_pop)
     print_pop(0, population)
     # print_pop(0, population)
     print_metadata()
@@ -73,8 +68,10 @@ def main():
                + f""" -e 'set ylabel "fitness"' """
                + f""" -e 'set y2tics autofreq' """
                + f""" -e 'set y2label "entropy"' """
-               + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 2 axes x1y1 title 'fitness' '''
-               + f'''     , '{gen_fname}' using 2:9 with lines lw 1 axes x1y2 title 'entropy'" '''
+               + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 2 axes x1y1 title 'top fitness' '''
+               + f'''     , '{gen_fname}' using 2:7 with lines lw 2 axes x1y2 title 'elite avg fitness' '''
+               + f'''     , '{gen_fname}' using 2:9 with lines lw 2 axes x1y2 title 'entropy' '''
+               + f'"'
                + (f""" -e "pause -1" """ if interactive else "")
                )
         print(f'# {("NON" if not interactive else "")} interactive')
@@ -105,10 +102,16 @@ def main():
     os.system(f'evince {func_fname}.pdf &')
 
 
-
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
     fit_list = calc_pop_fitness(pop)
+    # print('================ BEFORE ================')
+    # print(fit_list)
+    # print(pop)
+    pop, fit_list = sort_pop_by_fitness(pop, fit_list)
+    # print('================ AFTER ================')
+    # print(fit_list)
+    # print(pop)
     print_pop_stats(gen, pop, fit_list)
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
@@ -122,13 +125,15 @@ def print_pop_stats(gen, pop, fit_list):
     max_dude = pop[max_index] # best dude
     max_fit = fit_list[max_index]        # best dude's fitness
     avg_fit = np.mean(fit_list)
-    elite_avg_fit = np.mean(fit_list[:len(fit_list)//2])
+    elite_pop = sorted(fit_list, reverse=True)
+    elite_pop = elite_pop[:len(elite_pop) // 2]
+    elite_avg_fit = np.mean(elite_pop)
     entropy, occupancy = calc_entropy(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
-    line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude}'
-                     + f'   {float_to_bin(max_dude)}   {max_fit}'
-                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {occupancy}')
+    line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
+                     + f'   {float_to_bin(max_dude)}   {max_fit:20.26g}'
+                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
     print(line_to_print + '   ')
     with open(get_gen_info_fname(), 'a') as f:
         f.write(line_to_print + '\n')
@@ -138,14 +143,13 @@ def get_gen_info_fname():
 
 def calc_pop_fitness(pop):
     """Calculates the fitnesses of each member of a population and returns
-    a list with all of them."""
+    a list with all of them.  This list has the order of the members
+    of the population."""
     fit_list = []
     for dude in pop:
         dude_fitness = calc_fitness(dude)
-        if math.isnan(dude_fitness):
-            dude_fitness = -sys.float_info.max
         fit_list.append(dude_fitness)
-    return fit_list
+    return np.array(fit_list)
 
 
 def calc_fitness(x):
@@ -159,7 +163,11 @@ def calc_fitness(x):
     # # now multiply by a gaussian envelope
     # # fit = fit * math.exp(-x**2 / 100.0)
     # fit = math.cos(x-40)+10*math.exp(-(x-40)**2/5000)
-    fit = math.sin((x-40)/2) + 10*math.exp(-(x-40)**2/5000)
+    if not math.isfinite(x):
+        return -sys.float_info.max
+    fit = math.sin((x-400)/20) + 10*math.exp(-(x-400)**2/100000.0)
+    if not math.isfinite(fit):
+        return -sys.float_info.max
     return fit
 
 
@@ -197,7 +205,7 @@ def mate_bitflip(p1, p2):
     flipping bits in the ieee binary representation of their floating
     point values."""
     c1, c2 = crossover(p1, p2)
-    if random.random() < 0.1:   # a small % of the time make a big shift
+    if random.random() < mutation_rate:  # a small % of the time make a bit flip
         placeholder_1 = c1 + 0
         placeholder_2 = c2 + 0
         pos_1 = random.randint(0, 31)
@@ -218,6 +226,10 @@ def calc_genetic_distance(p1, p2):
 def calc_entropy(gen, pop):
     """Calculate the shannon entropy for this population by applying the
     Shannon formula using occupancy of each state in the population."""
+    # used_pop tracks the population members that we actually use.
+    # this excludes all NAN values.
+    n_pop_finite = 0
+    n_pop_bad = 0
     # print('pop:')
     # print_pop(gen, pop)
     pop_unique = list(set(pop))
@@ -226,11 +238,12 @@ def calc_entropy(gen, pop):
     # will work correctly
     # print('pop_unique:')
     # print_pop(gen, pop_unique)
-    pop_unique = [math.nan if math.isnan(x) else x for x in pop_unique]
+    pop_unique = [x for x in pop_unique if math.isfinite(x)]
     # print('pop_unique:')
     # print_pop(gen, pop_unique)
     n_species = len(pop_unique)
     occupancy = [0]*n_species
+    bad_strings = {}
     # our approach to calculating entropy is to form an "occupancy"
     # histogram: how many population members are in each possible bit
     # configuration.  Then we use Shannon's -Sum(p_i*log(p_i))
@@ -249,17 +262,32 @@ def calc_entropy(gen, pop):
         # In [26]: math.isnan(y)
         # Out[26]: True
         # print('ABOUT:', member, pop_unique)
-        if math.isnan(member):
-            occ_index = pop_unique.index(math.nan)
-        else:
+        # if math.isnan(member):
+        #     occ_index = pop_unique.index(math.nan)
+        # else:
+            # occ_index = pop_unique.index(member)
+        if math.isfinite(member):
             occ_index = pop_unique.index(member)
-        # occ_index = pop_unique.index(member)
-        occupancy[occ_index] += 1
+            occupancy[occ_index] += 1
+            n_pop_finite += 1
+        else:
+            n_pop_bad += 1
+        
     shannon_entropy = 0
     for i in range(len(occupancy)):
-        prob = occupancy[occ_index] / n_pop
+        # FIXME: I should study if I should divide by n_pop or
+        # n_pop_finite.  i.e. do I use fraction of full population, or
+        # fraction of finite population?
+        prob = occupancy[i] / n_pop
         individual_surprise = -prob * math.log(prob)
         shannon_entropy += individual_surprise
+    # now handle the bad numbers, those that are not finite.  we
+    # pretend that they are all different from each other (see
+    # Tolstoy), and add n_pop_bad * (-(1/n_pop) * log(1/n_pop))
+    prob = 1.0 / n_pop
+    individual_bad_surprise = -prob * math.log(prob)
+    shannon_entropy += n_pop_bad * individual_bad_surprise
+
     # print_pop(gen, pop)
     # # print(pop)
     return shannon_entropy, occupancy
@@ -370,6 +398,8 @@ def print_metadata():
 ##COMMAND_LINE: {sys.argv.__str__()}
 ##RUN_DATETIME: {dt_str}
 ##POLY_COEFS: {poly_coefs.__str__()}
+##random_seed: {random_seed}
+##MUTATION_RATE: {mutation_rate}
 ##N_POP: {n_pop}
 ##N_GENERATIONS: {num_generations}
 ##COLUMN0: constant string max_dude_fit:
@@ -383,17 +413,50 @@ def print_metadata():
 ##COLUMN8: population entroypy""")
 
 def print_poly_for_plot(fname):
-    x = -1000
+    x = -800
     with open(fname, 'w') as f:
-        while x <= 1000:
+        while x <= 800:
             f.write(f'fit_plot:   {x}   {calc_fitness(x)}\n')
-            x += 0.1
+            x += 0.5
     print(f'# wrote function info to {fname}')
+
+
+def sort_pop_by_fitness(pop, fit_list):
+    """Use the fitness list to sort the population."""
+    # zipped_lists = zip(fit_list, pop) # put fit_list first
+    # sorted_zip_lists = sorted(zipped_lists)
+    # sorted_pop = [element for _, element in sorted_zip_lists]
+    # sorted_fit_list = sorted(fit_list)
+    # # print(sorted_pop)
+    # return sorted_pop, sorted_fit_list
+    fit_list_inds_sorted = fit_list.argsort()
+    fit_list_sorted = fit_list[[fit_list_inds_sorted]]
+    pop_sorted = pop[[fit_list_inds_sorted]]
+    return pop_sorted, fit_list_sorted
+
+def make_initial_pop(n_pop):
+    # population = np.zeros(n_pop)
+    # for i in range(n_pop):
+    #     bitlist = [str(random.randint(0,1)) for i in range(32)]
+    #     bitstr = ''.join(bitlist)
+    #     x = bin_to_float(bitstr)
+    #     print(bitstr, x)
+    #     population[i] = x
+    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
+    population = np.random.uniform(low=-1000000.0000002, 
+                                   high=-1000000.0000001,
+                                   size=n_pop)
+    # population = np.full(n_pop, -1.78e30)
+    # population = np.random.uniform(low=-200000.0000000001, 
+    #                                # high=100000.0000000002,
+    #                                high=-100000.0000000002,
+    #                                size=n_pop)
+    return population
+
 
 # run_tests()
 if __name__ == '__main__':
     main()
-
 
 
 """
