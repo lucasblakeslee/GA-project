@@ -10,6 +10,7 @@ import random
 import struct
 from struct import pack, unpack
 import math
+from math import sin, exp
 from sys import exit
 import sys
 import os
@@ -29,9 +30,9 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 10000
+n_pop = 1500
 assert(n_pop % 2 == 0)
-mutation_rate = 0.3
+mutation_rate = 0.8
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 200
@@ -46,7 +47,8 @@ def main():
     population = make_initial_pop(n_pop)
     print_pop(0, population)
     # print_pop(0, population)
-    print_metadata()
+    gen_fname = get_gen_info_fname()
+    print_metadata(gen_fname)
     for gen in range(num_generations):
         new_pop = advance_one_generation(gen, population)
         population = new_pop
@@ -54,7 +56,6 @@ def main():
     print(f'# wrote fitness plot data to fit_func_pid{os.getpid()}.out')
     print(f'# wrote generation information to {get_gen_info_fname()}')
     print('# you could make plots with:')
-    gen_fname = get_gen_info_fname()
     for interactive in (True, False):
         cmd = ("gnuplot"
                + (f""" -e 'set terminal pdf' """
@@ -165,7 +166,8 @@ def calc_fitness(x):
     # fit = math.cos(x-40)+10*math.exp(-(x-40)**2/5000)
     if not math.isfinite(x):
         return -sys.float_info.max
-    fit = math.sin((x-400)/20) + 10*math.exp(-(x-400)**2/100000.0)
+    # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
+    fit = sin(x/20) * exp(-x**2/20000) + exp(-x**2/200000) + 0.2*sin(x/20)
     if not math.isfinite(fit):
         return -sys.float_info.max
     return fit
@@ -297,12 +299,13 @@ def mate_drift(p1, p2):
     """Mate two parents and get two children; do mutations by drifting the
     floating point value."""
     c1 = (p1 + p2) / 2.0
-    c1 += (random.random() - 0.5) * 0.1
+    c1 += (random.random() - 0.5) * mutation_rate
     c2 = (p1 + p2) / 2.0
-    c2 += (random.random() - 0.5) * 0.1
-    if random.random() < 0.1:   # 10% of the time make a big shift
-        c1 += (random.random() - 0.5) * 100.0
-        c2 += (random.random() - 0.5) * 100.0
+    # c2 += (random.random() - 0.5) * mutation_rate
+    c2 += np.random.lognormal(mutation_rate * 100)
+    if random.random() < 0.1:   # 10% of the time make shift 100 times bigger
+        c1 += (random.random() - 0.5) * 100.0 * mutation_rate
+        c2 += (random.random() - 0.5) * 100.0 * mutation_rate
     return c1, c2
 
 
@@ -386,7 +389,7 @@ def run_tests():
     x_after_processing = bin_to_float(xstr)
     print('from_str_to_float:', x_after_processing)
 
-def print_metadata():
+def print_metadata(fname):
     """Print some information about the run using the "low effort
     metadata" approach, described at
     https://programmingforresearch.wordpress.com/2020/06/07/low-effort-metadata-lem/
@@ -394,7 +397,8 @@ def print_metadata():
     from datetime import datetime
     my_date = datetime.now()
     dt_str = my_date.isoformat()
-    print(f"""##COMMENT: Genetic algorithm run
+    with open(fname, 'a') as f:
+        f.write(f"""##COMMENT: Genetic algorithm run
 ##COMMAND_LINE: {sys.argv.__str__()}
 ##RUN_DATETIME: {dt_str}
 ##POLY_COEFS: {poly_coefs.__str__()}
@@ -410,7 +414,8 @@ def print_metadata():
 ##COLUMN5: highest fitness
 ##COLUMN6: elite average fitness
 ##COLUMN7: average fitness
-##COLUMN8: population entroypy""")
+##COLUMN8: population entroypy
+""")
 
 def print_poly_for_plot(fname):
     x = -800
@@ -443,10 +448,11 @@ def make_initial_pop(n_pop):
     #     print(bitstr, x)
     #     population[i] = x
     # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    population = np.random.uniform(low=-1000000.0000002, 
-                                   high=-1000000.0000001,
+    population = np.random.uniform(low=-1000000.2,
+                                   high=-1000000.1,
                                    size=n_pop)
-    # population = np.full(n_pop, -1.78e30)
+
+    # population = np.full(n_pop, -1000.0)
     # population = np.random.uniform(low=-200000.0000000001, 
     #                                # high=100000.0000000002,
     #                                high=-100000.0000000002,

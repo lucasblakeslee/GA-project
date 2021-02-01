@@ -1,3 +1,8 @@
+2021-02-01  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: further adjustment of parameters to get a
+	reasonable run with the new fitness function.
+
 2021-01-31  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: adjusted parameters so that we get an evolution
