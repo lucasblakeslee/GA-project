@@ -17,6 +17,10 @@ import os
 
 import matplotlib.pyplot as plt
 
+# how much do we shift the exponentials in the sin */+ exp fitness
+# functions
+shift = 87500.3
+
 # polynomial coefficients.  it has to be even degree (i.e. list has to
 # have odd length), and last (most significant) coefficient has to be
 # negative so that it has a peak
@@ -30,13 +34,12 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 1500
+n_pop = 10000
 assert(n_pop % 2 == 0)
-mutation_rate = 0.8
+mutation_rate = 0.14
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 200
-
 best_outputs = []
 
 def main():
@@ -44,6 +47,7 @@ def main():
     # NOTE: you can force the seed to get reproducible runs.  comment
     # the random.seed() call to get different runs each time.
     random.seed(random_seed)
+    np.random.seed(random_seed)
     population = make_initial_pop(n_pop)
     print_pop(0, population)
     # print_pop(0, population)
@@ -167,7 +171,8 @@ def calc_fitness(x):
     if not math.isfinite(x):
         return -sys.float_info.max
     # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
-    fit = sin(x/20) * exp(-x**2/20000) + exp(-x**2/200000) + 0.2*sin(x/20)
+    xp = x - shift
+    fit = sin(xp/20) * exp(-xp**2/20000) + 100*exp(-xp**2/1000000) + 2*sin(xp/20)
     if not math.isfinite(fit):
         return -sys.float_info.max
     return fit
@@ -181,7 +186,7 @@ def select_pool(pop, fit_list, num_parents_mating):
     #find the indices
     sorted_parent_indices = np.argsort(fit_list)
     top_half_parent_indices = sorted_parent_indices[-num_parents_mating:]
-    top_half_parents = pop[[top_half_parent_indices]]
+    top_half_parents = pop[tuple([top_half_parent_indices])]
     # print('top_half_parents:', top_half_parents)
     child_pop = []
     # for i in range(num_parents_mating // 2):
@@ -401,6 +406,7 @@ def print_metadata(fname):
         f.write(f"""##COMMENT: Genetic algorithm run
 ##COMMAND_LINE: {sys.argv.__str__()}
 ##RUN_DATETIME: {dt_str}
+##SHIFT: {shift}
 ##POLY_COEFS: {poly_coefs.__str__()}
 ##random_seed: {random_seed}
 ##MUTATION_RATE: {mutation_rate}
@@ -418,9 +424,9 @@ def print_metadata(fname):
 """)
 
 def print_poly_for_plot(fname):
-    x = -800
+    x = shift - 1000
     with open(fname, 'w') as f:
-        while x <= 800:
+        while x <= shift + 1000:
             f.write(f'fit_plot:   {x}   {calc_fitness(x)}\n')
             x += 0.5
     print(f'# wrote function info to {fname}')
@@ -435,8 +441,8 @@ def sort_pop_by_fitness(pop, fit_list):
     # # print(sorted_pop)
     # return sorted_pop, sorted_fit_list
     fit_list_inds_sorted = fit_list.argsort()
-    fit_list_sorted = fit_list[[fit_list_inds_sorted]]
-    pop_sorted = pop[[fit_list_inds_sorted]]
+    fit_list_sorted = fit_list[tuple([fit_list_inds_sorted])]
+    pop_sorted = pop[tuple([fit_list_inds_sorted])]
     return pop_sorted, fit_list_sorted
 
 def make_initial_pop(n_pop):
@@ -447,10 +453,10 @@ def make_initial_pop(n_pop):
     #     x = bin_to_float(bitstr)
     #     print(bitstr, x)
     #     population[i] = x
-    # population = np.random.uniform(low=-100000.0, high=100000.0, size=n_pop)
-    population = np.random.uniform(low=-1000000.2,
-                                   high=-1000000.1,
-                                   size=n_pop)
+    population = np.random.uniform(low=-1000.0, high=1000.0, size=n_pop)
+    # population = np.random.uniform(low=-10000002,
+    #                                high=-10000001,
+    #                                size=n_pop)
 
     # population = np.full(n_pop, -1000.0)
     # population = np.random.uniform(low=-200000.0000000001, 
