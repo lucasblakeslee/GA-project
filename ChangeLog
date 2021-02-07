@@ -1,3 +1,9 @@
+2021-02-02  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: added the random seed setting for
+	np.random.seed() (in addition to random.seed()) for reproducible
+	runs.
+
 2021-02-01  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: further adjustment of parameters to get a
