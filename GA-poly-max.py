@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Evolves a genetic algorithm that looks for the max of a polynomial
-by flipping bits in the ieee binary representation of a floating point
+by flipping bits in the IEEE binary representation of a floating point
 number.
 """
 
@@ -469,35 +469,3 @@ def make_initial_pop(n_pop):
 # run_tests()
 if __name__ == '__main__':
     main()
-
-
-"""
-insert an analysis function that dumps out some more
-statistical quantities
-
-define a stability difference, the extent to which
-genetic difference leads to fitness difference
-
-
-track lineage and make phylogenetic trees
-
-because we know everything we can save everything to
-a file and hopefully have enough information to track
-evolution
-
-
-we picked random coefficients for our polynomial, one
-of the results of which is that all the action happens
-pretty close to zero but if you plot a small polynomial
-you don't have a clear insight about where the zeroes
-are, but if you plotted something like:
-(x-1000)*(x+20000)*(x+1e6)*(x+1e8)
-you have to have a very large range [-1e8:1e8] and then
-you can see all the zero crossings and all the interesting
-regions will be in drastically varying places
-
-for genetic distance it might be prudent to differentiate
-between the mantissa, signficand, and sign (two dudes with
-a different sign will be more distant from each other than
-two with the last bit flipped)
-"""

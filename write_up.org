@@ -1,0 +1,75 @@
+-*- mode: org -*-
+#+STARTUP: showall
+
+* Entorpy in Evolutionary Algorithms
+* Abstract:
+Genetic algorithms are a type of optimization algorithm based on natural selection. GAs have yielded
+impressive results in certain practical problems, yet there is still more to be understood about them
+on a theoretical level. This [paper/exercise] seeked to analyze how entropy changes throughout the
+evolution that occurs in a genetic algorithm. A simple GA designed to find the maxima of a polynomial
+was constructed, and diversity was tracked as a measure of entropy.
+
+* Motivation:
+Genetic algorithms (GAs) are stochastic search algorithms based on the process of natural evolution, solving for
+the 'fittest' solutions to a problem. GAs are optimization algorithms, designed to maximize or minimize certain
+functions. GAs are much more efficient than random or exhaustive search algorithms (Kinnear, 1994), however, they
+do not scale well with complexity (Radcliffe & Surry, 1995). While specifics may vary, there are some processes
+universal to GAs, which are: population → fitness evalutation → selection → crossover → mutation, repeat. Each 
+organism in the population has its own 'chromosome,' or set of characteristics. Here is where the resemblance 
+to biological evolution begins to weaken. The process continues to occur either until some condition for termination
+has been met, or until a pre-specified number of iterations has elapsed. Genetic algorithms have been used in a
+variety of practical applications, from making "evolved antennae" for spacecrafts and satellites to the estimation
+of heat flux between sea ice and the atmosphere to predictive economic models. Entropy and evolution have been
+often explored together, with research on the subject going as far back as the 1870s, though Schrödinger's 1944
+book /What is life?/ sparked a wave of modern interest. Here it was wondered how entropy would change over time
+in a genetic algorithm, in order to attain a better theoretical grasp of how they function.
+
+* Hypothesis:
+It was hypothesized that entropy would gradually rise as small non-significant mutations arose, and the occurance
+of one highly beneficial mutation in an organism would cause entropy to rapidly decrease as that mutation was 
+selected for, and then entropy would continue to rise, and the same cycle would repeat. It was hypothesized that 
+the entropy would never again become as high as it was originally. One "iteration" of this hypothesized cycle
+would look like a backwards log normal distribution.
+f(x)=1/((√2π)σx)exp(−(log(x)−μ)^2/2σ^2)
+
+* Approach:
+A plan was made, involving first construct a relatively simple genetic algorithm, and then analyzing the ways
+in which entropy changes over the course of finding a solution. The way that was decided to do this was
+to track diversity as a means of measuring the entropy.
+
+* Methods:
+First, a simple genetic algorithm was constructed to find the maxima of a polynomial, using the IEEE 754
+floating point format to represent the chromosomes of the organisms, or that organism's coefficients of
+X. The polynomial was structured as: ax^7 + ax^6  ... + ax^2 + ax + a.
+
+The population of 10,000 underwent the standard evalutation, selection, crossover, and mutation of a 
+GA, with information about the population being collected at the end of each iteration. Diversity was 
+measured using the hamming distance between the binary strings of two organisms, and the Shannon entropy
+of the population was calculated at the end of each iteration. Additionally, the elite and average fitnesses
+of the population were tracked.
+
+* Results:
+[I'm a little unclear on what our actual results were]
+
+* Discussion:
+** what does this mean?
+[once we have concrete results we can delve into this]
+
+** Limitations to genetic algorithms
+There are some limitations to genetic algorithms. For example, one must have a very clear understanding of the problem,
+constraints, the data structure, etc. Additionally, genetic algorithms do not scale well with complexity -- problems with
+large numbers of elements often become exponentially more difficult to compute. There is also the difficulty of ensuring
+the algorithm doesn't get stuck on a local maxima rather than the global one.
+
+** Future work
+Going forwards, it could be interesting to optimize a genetic algorithm from the standpoint of its entropy.
+
+* References
+*these will ultimately need to be alphebatized by last name of the first author*
+*the citation style should be consistent, I was thinking APA*
+
+Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), /Advances in Genetic Programming/ (pp. 3-17). Cambridge: MIT Press.
+
+Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search algorithms: Evolutionary computing in perspective.
+In: van Leeuwen J. (eds) Computer Science Today. Lecture Notes in Computer Science, vol 1000. Springer, Berlin, Heidelberg.
+https://doi.org/10.1007/BFb0015249
