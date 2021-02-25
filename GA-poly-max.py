@@ -1,10 +1,12 @@
+
 #!/usr/bin/env python3
 
 """Evolves a genetic algorithm that looks for the max of a polynomial
-by flipping bits in the IEEE binary representation of a floating point
+by flipping bits in the ieee binary representation of a floating point
 number.
 """
 
+import pandas as pd
 import numpy as np
 import random
 import struct
@@ -14,12 +16,19 @@ from math import sin, exp
 from sys import exit
 import sys
 import os
+import shortuuid
+
 
 import matplotlib.pyplot as plt
 
 # how much do we shift the exponentials in the sin */+ exp fitness
 # functions
 shift = 87500.3
+
+#creates unique name for the output file
+random_name = shortuuid.ShortUUID().random(length=5)
+#creates said file
+#open("GA-gen-info_pid{}.out".format(random_name), "x")
 
 # polynomial coefficients.  it has to be even degree (i.e. list has to
 # have odd length), and last (most significant) coefficient has to be
@@ -30,82 +39,116 @@ poly_coefs = [2.8, 1, 1, -3.6, 3.8, 1.6, -0.3]
 n_poly_coefs = len(poly_coefs)
 
 
+#datarame
+header = {
+    "gen" : [],
+    "max_index" : [],
+    "max_dude" : [],
+    "float_max_dude" : [],
+    "elite_avg_fit" : [],
+    "avg_fit" : [],
+    "entropy" : [],
+    "occupancy" : []
+}
+
+#df = pd.DataFrame(data = info, index=num_generations, columns=["max_index", "max_dude", "float_max_dude", "elite_avg_fit", "avg_fit", "entropy", "occupancy"] )
+
+       #''' (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'+ f'   {float_to_bin(max_dude)}   {max_fit:20.26g}' + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')'''
+         
+
+#
+
+
 ## parameters of the run
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 10000
+n_pop = 1000
 assert(n_pop % 2 == 0)
 mutation_rate = 0.14
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 200
-best_outputs = []
+num_generations = 1000
+global data_template
+data_template= []
+
+
 
 def main():
-    print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
+#    print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.  comment
     # the random.seed() call to get different runs each time.
     random.seed(random_seed)
     np.random.seed(random_seed)
     population = make_initial_pop(n_pop)
-    print_pop(0, population)
-    # print_pop(0, population)
-    gen_fname = get_gen_info_fname()
-    print_metadata(gen_fname)
+    #print_pop(0, population)
+    #print_pop(0, population)
+    #print_metadata(gen_fname)
+    data = np.empty(10000)
     for gen in range(num_generations):
         new_pop = advance_one_generation(gen, population)
         population = new_pop
+    df = pd.DataFrame(data_template, index=range(num_generations))    
+    df.to_csv(r'c:\GA-project\data_{}.txt'.format(random_name), header=None, index=None, sep='\t', mode='a')
+    print('c:\GA-project\data_{}.txt'.format(random_name))
+        #df = (data = data_template, index=num_generations, columns=["max_fit", "max_index", "max_dude", "float_max_dude", "elite_avg_fit", "avg_fit", "entropy", "occupancy"])
+        
+    # plt.title(Genetic Algorithm Developement)
+    # ax1.set_ylabel("Fitness")
+    # ax2.set_ylabel("Entropy")
+    # plt.autoscale(enable=True, axis='both', tight=False)
+    # plt.plot(genfname: 1, 2)
+    # #print(f'# wrote fitness plot data to fit_func_pid{os.getpid()}.out')
+    #print(f'# wrote generation information to {get_gen_info_fname()}')
+    #print('# you could make plots with:')
+    # for interactive in (True, False):
+    #     cmd = ("gnuplot"
+    #            + (f""" -e 'set terminal pdf' """
+    #               + f""" -e 'set output "{gen_fname}.pdf"' """
+    #               if not interactive else "")
+    #            + f" -e 'set grid'"
+    #            # + f" -e 'set multiplot layout 2, 1'"
+    #            + f""" -e 'set title "EvolutionPID{os.getpid()}"' """
+    #            # + f""" -e 'set logscale y' """
+    #            + f""" -e 'set ytics autofreq' """
+    #            + f""" -e 'set ylabel "fitness"' """
+    #            + f""" -e 'set y2tics autofreq' """
+    #            + f""" -e 'set y2label "entropy"' """
+    #            + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 2 axes x1y1 title 'top fitness' '''
+    #            + f'''     , '{gen_fname}' using 2:7 with lines lw 2 axes x1y2 title 'elite avg fitness' '''
+    #            + f'''     , '{gen_fname}' using 2:9 with lines lw 2 axes x1y2 title 'entropy' '''
+    #            + f'"'
+    #            + (f""" -e "pause -1" """ if interactive else "")
+    #            )
+    #     print(f'# {("NON" if not interactive else "")} interactive')
+    #     print(cmd)
+    #     os.system(cmd + ' &')
+    # os.system(f'evince {gen_fname}.pdf &')
+    # print('# and you can plot the function with:')
+    # func_fname = f'fit-func_pid{os.getpid()}.out'
+    # for interactive in (True, False):
+    #     cmd = ("gnuplot"
+    #            + (f""" -e 'set terminal pdf' """
+    #               + f""" -e 'set output "{func_fname}.pdf"' """
+    #               if not interactive else "")
+    #            + f" -e 'set grid'"
+    #            + f""" -e 'set title "FunctionPID{os.getpid()}"' """
+    #            # + f""" -e 'set logscale y' """
+    #            # + f""" -e 'set ytics autofreq' """
+    #            + f""" -e 'set xlabel "x"' """
+    #            + f""" -e 'set ylabel "fitness(x)"' """
+    #            # + f""" -e 'set y2tics autofreq' """
+    #            # + f""" -e 'set y2label "entropy"' """
+    #            + f''' -e "plot '{func_fname}' using 2:3 with lines lw 2 title 'fitness'" '''
+    #            + (f""" -e "pause -1" """ if interactive else "")
+    #            )
+    #     print(f'# {("NON" if not interactive else "")} interactive')
+    #     print(cmd)
+    # os.system(cmd + ' &')
+    # os.system(f'evince {func_fname}.pdf &')
 
-    print(f'# wrote fitness plot data to fit_func_pid{os.getpid()}.out')
-    print(f'# wrote generation information to {get_gen_info_fname()}')
-    print('# you could make plots with:')
-    for interactive in (True, False):
-        cmd = ("gnuplot"
-               + (f""" -e 'set terminal pdf' """
-                  + f""" -e 'set output "{gen_fname}.pdf"' """
-                  if not interactive else "")
-               + f" -e 'set grid'"
-               # + f" -e 'set multiplot layout 2, 1'"
-               + f""" -e 'set title "EvolutionPID{os.getpid()}"' """
-               # + f""" -e 'set logscale y' """
-               + f""" -e 'set ytics autofreq' """
-               + f""" -e 'set ylabel "fitness"' """
-               + f""" -e 'set y2tics autofreq' """
-               + f""" -e 'set y2label "entropy"' """
-               + f''' -e "plot '{gen_fname}' using 2:6 with lines lw 2 axes x1y1 title 'top fitness' '''
-               + f'''     , '{gen_fname}' using 2:7 with lines lw 2 axes x1y2 title 'elite avg fitness' '''
-               + f'''     , '{gen_fname}' using 2:9 with lines lw 2 axes x1y2 title 'entropy' '''
-               + f'"'
-               + (f""" -e "pause -1" """ if interactive else "")
-               )
-        print(f'# {("NON" if not interactive else "")} interactive')
-        print(cmd)
-        os.system(cmd + ' &')
-    os.system(f'evince {gen_fname}.pdf &')
-    print('# and you can plot the function with:')
-    func_fname = f'fit-func_pid{os.getpid()}.out'
-    for interactive in (True, False):
-        cmd = ("gnuplot"
-               + (f""" -e 'set terminal pdf' """
-                  + f""" -e 'set output "{func_fname}.pdf"' """
-                  if not interactive else "")
-               + f" -e 'set grid'"
-               + f""" -e 'set title "FunctionPID{os.getpid()}"' """
-               # + f""" -e 'set logscale y' """
-               # + f""" -e 'set ytics autofreq' """
-               + f""" -e 'set xlabel "x"' """
-               + f""" -e 'set ylabel "fitness(x)"' """
-               # + f""" -e 'set y2tics autofreq' """
-               # + f""" -e 'set y2label "entropy"' """
-               + f''' -e "plot '{func_fname}' using 2:3 with lines lw 2 title 'fitness'" '''
-               + (f""" -e "pause -1" """ if interactive else "")
-               )
-        print(f'# {("NON" if not interactive else "")} interactive')
-        print(cmd)
-    os.system(cmd + ' &')
-    os.system(f'evince {func_fname}.pdf &')
 
+    
 
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
@@ -117,15 +160,6 @@ def advance_one_generation(gen, pop):
     # print('================ AFTER ================')
     # print(fit_list)
     # print(pop)
-    print_pop_stats(gen, pop, fit_list)
-    # Selecting the best parents in the population for mating.
-    new_pop = select_pool(pop, fit_list, num_parents_mating)
-    return new_pop
-
-def print_pop_stats(gen, pop, fit_list):
-    """Print useful bits of info about the current population list."""
-    # print("fitness_list:", fit_list)
-    # The best result in the current iteration.
     max_index = np.argmax(fit_list) # best dude's index
     max_dude = pop[max_index] # best dude
     max_fit = fit_list[max_index]        # best dude's fitness
@@ -134,18 +168,46 @@ def print_pop_stats(gen, pop, fit_list):
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
     entropy, occupancy = calc_entropy(gen, pop)
+    # global data_template
+    data_template.append({"max_fit" : max_fit, "max_dude" : max_index, "float_max_dude" : float_to_bin(max_dude), "elite_avg_fit" : elite_avg_fit, "avg_fit" : avg_fit, "entropy" : entropy, "occupancy" : sorted(occupancy, reverse=True)[:20]})
+    # Selecting the best parents in the population for mating.
+    new_pop = select_pool(pop, fit_list, num_parents_mating)
+    return new_pop
+
+def print_pop_stats(gen, pop, fit_list):
+    """Print useful bits of info about the current population list."""
+    # print("fitness_list:", fit_list)
+    # The best result in the current iteration.
+    # max_index = np.argmax(fit_list) # best dude's index
+    # max_dude = pop[max_index] # best dude
+    # max_fit = fit_list[max_index]        # best dude's fitness
+    # avg_fit = np.mean(fit_list)
+    # elite_pop = sorted(fit_list, reverse=True)
+    # elite_pop = elite_pop[:len(elite_pop) // 2]
+    # elite_avg_fit = np.mean(elite_pop)
+    # entropy, occupancy = calc_entropy(gen, pop)
+    # # global data_template
+    # # data_template= []
+    # # data_template.append({"max_fit" : max_fit, "max_dude" : max_index, "float_max_dude" : float_to_bin(max_dude), "elite_avg_fit" : elite_avg_fit, "avg_fit" : avg_fit, "entropy" : entropy, "occupancy" : sorted(occupancy, reverse=True)[:20]})
+    # #data_template.append({"max_fit" : max_fit})
+    #data_template.append({"max_dude" : max_index})
+    #data_template.append({"float_max_dude" : float_to_bin(max_dude)})
+    #data_template.append({"elite_avg_fit" : elite_avg_fit})
+    #data_template.append({"avg_fit" : avg_fit})
+    #data_template.append({"entropy" : entropy})
+    #data_template.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
+    #print(data_template)
+    
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
-    line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
-                     + f'   {float_to_bin(max_dude)}   {max_fit:20.26g}'
-                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
-    print(line_to_print + '   ')
-    with open(get_gen_info_fname(), 'a') as f:
-        f.write(line_to_print + '\n')
+    #line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
+     #                + f'   {float_to_bin(max_dude)}   {max_fit:20.26g}'
+     #                + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
+#    print(line_to_print + '   ')
+    #with open(get_gen_info_fname(), 'a') as f:
+     #   f.write(line_to_print + '\n')
 
-def get_gen_info_fname():
-    return f'GA-gen-info_pid{os.getpid()}.out'
-
+    
 def calc_pop_fitness(pop):
     """Calculates the fitnesses of each member of a population and returns
     a list with all of them.  This list has the order of the members
@@ -468,4 +530,33 @@ def make_initial_pop(n_pop):
 
 # run_tests()
 if __name__ == '__main__':
-    main()
+    main()    
+# plt.plot(outputs)
+# plt.xlabel('gen')
+# plt.ylabel('fit')
+# plt.show()
+
+
+"""
+insert an analysis function that dumps out some more
+statistical quantities
+define a stability difference, the extent to which
+genetic difference leads to fitness difference
+track lineage and make phylogenetic trees
+because we know everything we can save everything to
+a file and hopefully have enough information to track
+evolution
+we picked random coefficients for our polynomial, one
+of the results of which is that all the action happens
+pretty close to zero but if you plot a small polynomial
+you don't have a clear insight about where the zeroes
+are, but if you plotted something like:
+(x-1000)*(x+20000)*(x+1e6)*(x+1e8)
+you have to have a very large range [-1e8:1e8] and then
+you can see all the zero crossings and all the interesting
+regions will be in drastically varying places
+for genetic distance it might be prudent to differentiate
+between the mantissa, signficand, and sign (two dudes with
+a different sign will be more distant from each other than
+two with the last bit flipped)
+"""
