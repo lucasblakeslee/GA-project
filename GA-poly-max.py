@@ -16,8 +16,6 @@ from sys import exit
 import sys
 import os
 import shortuuid
-
-
 import matplotlib.pyplot as plt
 
 # how much do we shift the exponentials in the sin */+ exp fitness
@@ -41,12 +39,12 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 100
+n_pop = 400
 assert(n_pop % 2 == 0)
 mutation_rate = 0.14
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 100
+num_generations = 1000
 global data_template
 data_template= []
 
@@ -54,8 +52,8 @@ data_template= []
 
 def main():
 #    print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
-    # NOTE: you can force the seed to get reproducible runs.  comment
-    # the random.seed() call to get different runs each time.
+    # NOTE: you can force the seed to get reproducible runs.
+    # comment the random.seed() call to get different runs each time.
     random.seed(random_seed)
     np.random.seed(random_seed)
     population = make_initial_pop(n_pop)
@@ -64,9 +62,22 @@ def main():
         new_pop = advance_one_generation(gen, population)
         population = new_pop
     global df
-    df = pd.DataFrame(data_template, index=range(num_generations))    
+    df = pd.DataFrame(data_template, index=range(num_generations))
     df.to_csv(r'data_{}.txt'.format(random_name), header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
-    print('data_{}.txt'.format(random_name))        
+    print('data_{}.txt'.format(random_name))
+
+    df[["gen", 
+        "max_fit", 
+        #"elite_avg_fit",
+        "avg_fit", 
+        #"entropy"
+        ]].plot(x="gen")
+    plt.show()
+
+    
+ #   df = df.drop(columns=["gen"])
+ #   df.plot()
+ #   plt.show()
 
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
@@ -80,14 +91,21 @@ def advance_one_generation(gen, pop):
     # print(pop)
     max_index = np.argmax(fit_list) # best dude's index
     max_dude = pop[max_index] # best dude
-    max_fit = fit_list[max_index]        # best dude's fitness
+    max_fit = fit_list[max_index] # best dude's fitness
     avg_fit = np.mean(fit_list)
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
     entropy, occupancy = calc_entropy(gen, pop)
     # global data_template
-    data_template.append({"gen" : gen, "max_fit" : max_fit, "max_dude" : max_index, "float_max_dude" : float_to_bin(max_dude), "elite_avg_fit" : elite_avg_fit, "avg_fit" : avg_fit, "entropy" : entropy, "occupancy" : sorted(occupancy, reverse=True)[:20]})
+    data_template.append({"gen" : gen,
+                          "max_fit" : max_fit,
+                          "max_dude" : max_index,
+                          "float_max_dude" : float_to_bin(max_dude),
+                          "elite_avg_fit" : elite_avg_fit,
+                          "avg_fit" : avg_fit,
+                          "entropy" : entropy,
+                          "occupancy" : sorted(occupancy, reverse=True)[:20]})
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
     return new_pop
@@ -101,7 +119,6 @@ def calc_pop_fitness(pop):
         dude_fitness = calc_fitness(dude)
         fit_list.append(dude_fitness)
     return np.array(fit_list)
-
 
 def calc_fitness(x):
     """evaluate the polynomial at the given point - for now that's our
@@ -122,7 +139,6 @@ def calc_fitness(x):
     if not math.isfinite(fit):
         return -sys.float_info.max
     return fit
-
 
 def select_pool(pop, fit_list, num_parents_mating):
     """Take the population, pick out the top half of the parents, and
@@ -174,7 +190,6 @@ def calc_genetic_distance(p1, p2):
     array_p2 = bytearray(b, 'utf-8')
     genetic_distance = np.sum(np.bitwise_xor(array_p1,array_p2))
     return genetic_distance
-
 
 def calc_entropy(gen, pop):
     """Calculate the shannon entropy for this population by applying the
@@ -297,8 +312,6 @@ def crossover(p1, p2):
     c2 = bin_to_float(''.join(c2bits))
     return c1, c2
 
-
-
 def mutation(offspring_crossover, num_mutations=1):
     # Mutation changes a single gene in each offspring randomly.
     for idx in range(offspring_crossover.shape[0]):
@@ -309,15 +322,6 @@ def mutation(offspring_crossover, num_mutations=1):
             random_value = np.random.uniform(-1.0, 1.0, 1)
             offspring_crossover[idx, mutation_index] = offspring_crossover[idx, mutation_index] + random_value
         return offspring_crossover
-        
-
-def make_plots(best_outputs):
-    # Iteration vs. Fitness
-    import matplotlib.pyplot
-    matplotlib.pyplot.plot(best_outputs)
-    matplotlib.pyplot.xlabel("Iteration")
-    matplotlib.pyplot.ylabel("Fitness")
-    matplotlib.pyplot.show()
 
 def print_pop(gen, pop):
     print(f'# population at generation {gen}')
@@ -411,39 +415,6 @@ def make_initial_pop(n_pop):
     #                                size=n_pop)
     return population
 
-
 # run_tests()
 if __name__ == '__main__':
     main()
-# fit_graph = df.plot(x = "gen", y = "max_fit")
-# entropy_graph = df.plot(x = "gen", y = "entropy")
-# elite_graph = df.plot(x = "gen", y = "elite_avg_fit")
-# plt.plot(fit_graph, entropy_graph, elite_graph)
-# plt.legend(["Max Fitness", "Entropy", "Elite Average Fitness"])
-# plt.show()
-df = df.drop(columns=["gen"])
-df.plot()
-plt.show()
-"""
-insert an analysis function that dumps out some more
-statistical quantities
-define a stability difference, the extent to which
-genetic difference leads to fitness difference
-track lineage and make phylogenetic trees
-because we know everything we can save everything to
-a file and hopefully have enough information to track
-evolution
-we picked random coefficients for our polynomial, one
-of the results of which is that all the action happens
-pretty close to zero but if you plot a small polynomial
-you don't have a clear insight about where the zeroes
-are, but if you plotted something like:
-(x-1000)*(x+20000)*(x+1e6)*(x+1e8)
-you have to have a very large range [-1e8:1e8] and then
-you can see all the zero crossings and all the interesting
-regions will be in drastically varying places
-for genetic distance it might be prudent to differentiate
-between the mantissa, signficand, and sign (two dudes with
-a different sign will be more distant from each other than
-two with the last bit flipped)
-"""
