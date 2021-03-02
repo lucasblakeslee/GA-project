@@ -66,12 +66,35 @@ def main():
     df.to_csv(r'data_{}.txt'.format(random_name), header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
     print('data_{}.txt'.format(random_name))
 
-    df[["gen", 
-        "max_fit", 
-        #"elite_avg_fit",
-        "avg_fit", 
-        #"entropy"
-        ]].plot(x="gen")
+    fig, ax1 = plt.subplots()
+
+    ax1.set_xlabel("gen")
+    ax1.set_ylabel('Fitness')
+    ax1.plot(df[["avg_fit"]], "b-")
+    ax1.tick_params(axis='y', labelcolor="blue")
+
+    ax2= ax1.twinx()
+
+    ax2.set_ylabel('Entropy')
+    ax2.plot(df[["entropy"]], "r-")
+    ax2.tick_params(axis='y', labelcolor="red")
+
+    ax3 = ax1.twinx()
+
+    ax3.set_ylabel('Max Individual')
+    ax3.plot(df[["max_dude"]], "g-")
+    ax3.tick_params(axis='y', labelcolor="green")
+    ax3.spines['right'].set_position(('outward', 40))
+
+    plt.style.use('seaborn')
+    plt.tight_layout()
+    # df[["gen", 
+    #     "max_fit", 
+    #     #"elite_avg_fit",
+    #     "avg_fit", 
+    #     #"entropy"
+    #     ]].plot(x="gen")
+
     plt.show()
 
     
@@ -119,6 +142,12 @@ def calc_pop_fitness(pop):
         dude_fitness = calc_fitness(dude)
         fit_list.append(dude_fitness)
     return np.array(fit_list)
+
+# def make_patch_spines_invisible(ax):
+#     ax.set_frame_on(True)
+#     ax.patch.set_visible(False)
+#     for sp in ax.spines.values():
+#         sp.set_visible(False)
 
 def calc_fitness(x):
     """evaluate the polynomial at the given point - for now that's our
