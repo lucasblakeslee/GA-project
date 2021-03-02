@@ -143,12 +143,6 @@ def calc_pop_fitness(pop):
         fit_list.append(dude_fitness)
     return np.array(fit_list)
 
-# def make_patch_spines_invisible(ax):
-#     ax.set_frame_on(True)
-#     ax.patch.set_visible(False)
-#     for sp in ax.spines.values():
-#         sp.set_visible(False)
-
 def calc_fitness(x):
     """evaluate the polynomial at the given point - for now that's our
     fitness function.  sometimes we also multiply it by a wide
