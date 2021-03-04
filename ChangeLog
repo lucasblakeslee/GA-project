@@ -1,5 +1,8 @@
 2021-03-03  Mark Galassi  <mark@galassi.org>
 
+	* GA-poly-max.py: introduced an oscillation_scale parameter,
+	commented at the top of the code.
+
 	* GA-poly-max.py: experimented with parameters and changed to
 	drift mutation instead of bitflip mutation.  The goal is to get a
 	royal road, and the current parameters give us such a thing by

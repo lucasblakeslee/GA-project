@@ -41,7 +41,11 @@ n_poly_coefs = len(poly_coefs)
 random_seed = 123456
 n_pop = 4000
 assert(n_pop % 2 == 0)
-mutation_rate = 20*math.pi
+# define an "oscillation scale" which is the typical distance between
+# the sin() peaks (i.e. the period!) this is then used to define
+# "mutation rate" and entropy bin sizes for drift mutation
+oscillation_scale = 40*math_pi
+mutation_rate = oscillation_scale / 2.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 2000
@@ -183,7 +187,7 @@ def calc_fitness(x):
         return -sys.float_info.max
     # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
     xp = x - shift
-    fit = sin(xp/20) * exp(-xp**2/20000) + 100*exp(-xp**2/1000000) + 2*sin(xp/20)
+    fit = sin(2*math.pi*xp/oscillation_scale) * exp(-xp**2/20000) + 100*exp(-xp**2/1000000) + 2*sin(2*math.pi*xp/oscillation_scale)
     if not math.isfinite(fit):
         return -sys.float_info.max
     return fit
