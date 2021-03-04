@@ -1,3 +1,11 @@
+2021-03-03  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: experimented with parameters and changed to
+	drift mutation instead of bitflip mutation.  The goal is to get a
+	royal road, and the current parameters give us such a thing by
+	jiggling in each local maximum for a while before finding the next
+	higher peak.
+
 2021-02-02  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: added the random seed setting for

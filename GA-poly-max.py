@@ -39,12 +39,12 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 400
+n_pop = 4000
 assert(n_pop % 2 == 0)
-mutation_rate = 0.14
+mutation_rate = 20*math.pi
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 1000
+num_generations = 2000
 global data_template
 data_template= []
 
@@ -54,6 +54,8 @@ def main():
 #    print_poly_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.
     # comment the random.seed() call to get different runs each time.
+    gen_fname = get_gen_info_fname()
+    print_metadata(gen_fname)
     random.seed(random_seed)
     np.random.seed(random_seed)
     population = make_initial_pop(n_pop)
@@ -105,13 +107,7 @@ def main():
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
     fit_list = calc_pop_fitness(pop)
-    # print('================ BEFORE ================')
-    # print(fit_list)
-    # print(pop)
     pop, fit_list = sort_pop_by_fitness(pop, fit_list)
-    # print('================ AFTER ================')
-    # print(fit_list)
-    # print(pop)
     max_index = np.argmax(fit_list) # best dude's index
     max_dude = pop[max_index] # best dude
     max_fit = fit_list[max_index] # best dude's fitness
@@ -129,9 +125,38 @@ def advance_one_generation(gen, pop):
                           "avg_fit" : avg_fit,
                           "entropy" : entropy,
                           "occupancy" : sorted(occupancy, reverse=True)[:20]})
+    print_pop_stats(gen, pop, fit_list)
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
     return new_pop
+
+
+def print_pop_stats(gen, pop, fit_list):
+    """Print useful bits of info about the current population list."""
+    # print("fitness_list:", fit_list)
+    # The best result in the current iteration.
+    max_index = np.argmax(fit_list) # best dude's index
+    max_dude = pop[max_index] # best dude
+    max_fit = fit_list[max_index]        # best dude's fitness
+    avg_fit = np.mean(fit_list)
+    elite_pop = sorted(fit_list, reverse=True)
+    elite_pop = elite_pop[:len(elite_pop) // 2]
+    elite_avg_fit = np.mean(elite_pop)
+    entropy, occupancy = calc_entropy(gen, pop)
+    # print(fit_list)
+    # print("best_result:", max_index, max_dude, max_fit)
+    line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
+                     + f'   {float_to_bin(max_dude)}   {max_fit:20.26g}'
+                     + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
+    print(line_to_print + '   ')
+    with open(get_gen_info_fname(), 'a') as f:
+        f.write(line_to_print + '\n')
+        f.flush()
+
+
+def get_gen_info_fname():
+    return f'GA-gen-info_pid{os.getpid()}.out'
+
 
 def calc_pop_fitness(pop):
     """Calculates the fitnesses of each member of a population and returns
@@ -172,21 +197,15 @@ def select_pool(pop, fit_list, num_parents_mating):
     sorted_parent_indices = np.argsort(fit_list)
     top_half_parent_indices = sorted_parent_indices[-num_parents_mating:]
     top_half_parents = pop[tuple([top_half_parent_indices])]
-    # print('top_half_parents:', top_half_parents)
     child_pop = []
-    # for i in range(num_parents_mating // 2):
-    #     #print('i:', i, num_parents_mating)
-    #     print('top_half_parents:', top_half_parents)
-    #     print(' ')
     child_pop = []
     for i in range(num_parents_mating // 2):
-#        print('i:', i, num_parents_mating)
         p1 = top_half_parents[2*i]
         p2 = top_half_parents[2*i + 1]
         ## for now we have this set up so you can choose your mating
         ## function to be mate_bitflip() or mate_drift()
-        c1, c2 = mate_bitflip(p1, p2)
-        # c1, c2 = mate_drift(p1, p2)
+        # c1, c2 = mate_bitflip(p1, p2)
+        c1, c2 = mate_drift(p1, p2)
         child_pop.append(c1)
         child_pop.append(c2)
     new_pop = np.concatenate((child_pop, top_half_parents))
@@ -221,17 +240,11 @@ def calc_entropy(gen, pop):
     # this excludes all NAN values.
     n_pop_finite = 0
     n_pop_bad = 0
-    # print('pop:')
-    # print_pop(gen, pop)
     pop_unique = list(set(pop))
     # now collapse all NANs (numbers that satisfy math.isnan(x)) into
     # the single math.nan value.  this way the pop_unique.index() call
     # will work correctly
-    # print('pop_unique:')
-    # print_pop(gen, pop_unique)
     pop_unique = [x for x in pop_unique if math.isfinite(x)]
-    # print('pop_unique:')
-    # print_pop(gen, pop_unique)
     n_species = len(pop_unique)
     occupancy = [0]*n_species
     bad_strings = {}
@@ -279,8 +292,6 @@ def calc_entropy(gen, pop):
     individual_bad_surprise = -prob * math.log(prob)
     shannon_entropy += n_pop_bad * individual_bad_surprise
 
-    # print_pop(gen, pop)
-    # # print(pop)
     return shannon_entropy, occupancy
 
 
@@ -290,11 +301,11 @@ def mate_drift(p1, p2):
     c1 = (p1 + p2) / 2.0
     c1 += (random.random() - 0.5) * mutation_rate
     c2 = (p1 + p2) / 2.0
-    # c2 += (random.random() - 0.5) * mutation_rate
-    c2 += np.random.lognormal(mutation_rate * 100)
-    if random.random() < 0.1:   # 10% of the time make shift 100 times bigger
-        c1 += (random.random() - 0.5) * 100.0 * mutation_rate
-        c2 += (random.random() - 0.5) * 100.0 * mutation_rate
+    c2 += (random.random() - 0.5) * mutation_rate
+    # c2 += np.random.lognormal(mutation_rate * 100)
+    if random.random() < 0.01:   # small % of the time make shift 100 times bigger
+        c1 += (random.random() - 0.5) * 5*mutation_rate
+        c2 += (random.random() - 0.5) * 5*mutation_rate
     return c1, c2
 
 
@@ -426,7 +437,7 @@ def make_initial_pop(n_pop):
     #     x = bin_to_float(bitstr)
     #     print(bitstr, x)
     #     population[i] = x
-    population = np.random.uniform(low=-1000.0, high=1000.0, size=n_pop)
+    population = np.random.uniform(low=70000.0, high=85000.0, size=n_pop)
     # population = np.random.uniform(low=-10000002,
     #                                high=-10000001,
     #                                size=n_pop)
