@@ -45,10 +45,10 @@ assert(n_pop % 2 == 0)
 # the sin() peaks (i.e. the period!) this is then used to define
 # "mutation rate" and entropy bin sizes for drift mutation
 oscillation_scale = 40*math.pi
-mutation_rate = oscillation_scale / 2.0
+mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 1000
+num_generations = 10000
 global data_template
 data_template= []
 
@@ -119,7 +119,8 @@ def advance_one_generation(gen, pop):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy(gen, pop)
+    # entropy, occupancy = calc_entropy(gen, pop)
+    entropy, occupancy = calc_entropy_drift(gen, pop)
     # global data_template
     data_template.append({"gen" : gen,
                           "max_fit" : max_fit,
@@ -146,7 +147,7 @@ def print_pop_stats(gen, pop, fit_list):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy(gen, pop)
+    entropy, occupancy = calc_entropy_drift(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
@@ -273,7 +274,7 @@ def calc_entropy(gen, pop):
         # if math.isnan(member):
         #     occ_index = pop_unique.index(math.nan)
         # else:
-            # occ_index = pop_unique.index(member)
+        #     occ_index = pop_unique.index(member)
         if math.isfinite(member):
             occ_index = pop_unique.index(member)
             occupancy[occ_index] += 1
@@ -281,22 +282,59 @@ def calc_entropy(gen, pop):
         else:
             n_pop_bad += 1
         
+    shannon_entropy = occupancy_list2entropy(occupancy)
+    return shannon_entropy, occupancy
+
+def calc_entropy_drift(gen, pop):
+    """Entropy calculation that is appropriate for drift mutations.  The
+    main difference is that instead of assuming unique population
+    members, we instead put the population into bins -- i.e. we define
+    the species to be linearly spaced bins in the population's range
+    of values.  Then we use occupancy levels in those bins to
+    calculate entropy."""
+    n_bins = n_pop
+    pmin = np.min(pop)
+    pmax = np.max(pop)
+    pop_spread = pmax - pmin
+    bin_width = pop_spread / n_bins
+    occupancy = [0]*n_bins
+    for i in range(n_bins):
+        x_left_edge = pmin + i * bin_width
+        x_right_edge = pmin + (i+1) * bin_width
+        occupancy[i] = count_pop_in_bin(pop, x_left_edge, x_right_edge)
+    print('DRIFT_occupancy:', occupancy)
+    entropy = occupancy_list2entropy(occupancy)
+    return entropy, occupancy
+
+
+def occupancy_list2entropy(occ_list):
+    """Underlying formula for entropy: this is the Shannon formula that
+    takes occupancy probability and divides by the log thereof."""
     shannon_entropy = 0
-    for i in range(len(occupancy)):
+    for i in range(len(occ_list)):
         # FIXME: I should study if I should divide by n_pop or
         # n_pop_finite.  i.e. do I use fraction of full population, or
         # fraction of finite population?
-        prob = occupancy[i] / n_pop
-        individual_surprise = -prob * math.log(prob)
-        shannon_entropy += individual_surprise
-    # now handle the bad numbers, those that are not finite.  we
-    # pretend that they are all different from each other (see
-    # Tolstoy), and add n_pop_bad * (-(1/n_pop) * log(1/n_pop))
-    prob = 1.0 / n_pop
-    individual_bad_surprise = -prob * math.log(prob)
-    shannon_entropy += n_pop_bad * individual_bad_surprise
+        if occ_list[i] != 0:
+            prob = occ_list[i] / n_pop
+            individual_surprise = -prob * math.log(prob)
+            shannon_entropy += individual_surprise
+    # # now handle the bad numbers, those that are not finite.  we
+    # # pretend that they are all different from each other (see
+    # # Tolstoy), and add n_pop_bad * (-(1/n_pop) * log(1/n_pop))
+    # prob = 1.0 / n_pop
+    # individual_bad_surprise = -prob * math.log(prob)
+    # shannon_entropy += n_pop_bad * individual_bad_surprise
 
-    return shannon_entropy, occupancy
+    return shannon_entropy
+
+
+def count_pop_in_bin(pop, left, right):
+    total = 0
+    for member in pop:
+        if member >= left and member < right:
+            total += 1
+    return total
 
 
 def mate_drift(p1, p2):
