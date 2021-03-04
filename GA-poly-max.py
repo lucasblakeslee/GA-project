@@ -39,16 +39,16 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 4000
+n_pop = 400
 assert(n_pop % 2 == 0)
 # define an "oscillation scale" which is the typical distance between
 # the sin() peaks (i.e. the period!) this is then used to define
 # "mutation rate" and entropy bin sizes for drift mutation
-oscillation_scale = 40*math_pi
+oscillation_scale = 40*math.pi
 mutation_rate = oscillation_scale / 2.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 2000
+num_generations = 1000
 global data_template
 data_template= []
 
