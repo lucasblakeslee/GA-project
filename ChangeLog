@@ -1,5 +1,9 @@
 2021-03-03  Mark Galassi  <mark@galassi.org>
 
+	* GA-poly-max.py (calc_entropy_drift, print_pop_stats)
+	(advance_one_generation): switched the entropy calculation to a
+	version more appropriate for drift mutations.
+
 	* GA-poly-max.py: introduced an oscillation_scale parameter,
 	commented at the top of the code.
 
