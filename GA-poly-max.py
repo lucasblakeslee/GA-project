@@ -48,7 +48,7 @@ oscillation_scale = 40*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 1000
+num_generations = 10000
 global data_template
 data_template= []
 
@@ -72,45 +72,7 @@ def main():
     df.to_csv(r'data_{}.txt'.format(random_name), header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
     print('data_{}.txt'.format(random_name))
 
-    # fig, ax1 = plt.subplots()
-
-    # ax1.set_xlabel("gen")
-    # ax1.set_ylabel('Fitness')
-    # ax1.plot(df[["avg_fit"]], "b-")
-    # ax1.tick_params(axis='y', labelcolor="blue")
-
-    # ax2= ax1.twinx()
-
-    # ax2.set_ylabel('Entropy')
-    # ax2.plot(df[["entropy"]], "r-")
-    # ax2.tick_params(axis='y', labelcolor="red")
-
-    # ax3 = ax1.twinx()
-
-    # ax3.set_ylabel('Max Individual')
-    # ax3.plot(df[["max_dude"]], "g-")
-    # ax3.tick_params(axis='y', labelcolor="green")
-    # ax3.spines['right'].set_position(('outward', 40))
-
-    # plt.style.use('seaborn')
-    # plt.tight_layout()
-
-    
-    # df[["gen", 
-    #     "max_fit", 
-    #     #"elite_avg_fit",
-    #     "avg_fit", 
-    #     #"entropy"
-    #     ]].plot(x="gen")
-
-    sexy_main_graph(df)
-    vertical_fit(df)
-    plt.show()
-
-def sexy_main_graph(df):
-    fig = plt.figure(1)
-
-    ax1 = fig.add_subplot()
+    fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("gen")
     ax1.set_ylabel('Fitness')
@@ -139,22 +101,8 @@ def sexy_main_graph(df):
     #     #"entropy"
     #     ]].plot(x="gen")
 
+    plt.show()
 
- #   df = df.drop(columns=["gen"])
- #   df.plot()
- #   plt.show()
-
-def vertical_fit(df):
-
-    fig = plt.figure(2)
-    ax = plt.subplot()
-
-    ax.set_xlabel("Max Dude")
-    ax.set_ylabel('Max Fitness')
-    x = df[["max_dude"]]
-    y = df[["max_fit"]]
-    ax.plot(x, y)
-    ax.tick_params(axis='y', labelcolor="blue")
     
  #   df = df.drop(columns=["gen"])
  #   df.plot()
