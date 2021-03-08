@@ -39,7 +39,7 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 400
+n_pop = 4
 assert(n_pop % 2 == 0)
 # define an "oscillation scale" which is the typical distance between
 # the sin() peaks (i.e. the period!) this is then used to define
@@ -48,7 +48,7 @@ oscillation_scale = 40*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 10000
+num_generations = 100
 global data_template
 data_template= []
 
@@ -69,10 +69,15 @@ def main():
         population = new_pop
     global df
     df = pd.DataFrame(data_template, index=range(num_generations))
-    df.to_csv(r'data_{}.txt'.format(random_name), header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
-    print('data_{}.txt'.format(random_name))
+    df.to_csv(f'data_{random_name}.txt', header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
+    print(f'data_{random_name}.txt')
+    main_graph(df)
+    fit_vs_dude(df)
+    #occu_histo(df)
+    plt.show()
 
-    fig, ax1 = plt.subplots()
+def main_graph(df):
+    fig, ax1= plt.subplots()
 
     ax1.set_xlabel("gen")
     ax1.set_ylabel('Fitness')
@@ -91,8 +96,8 @@ def main():
     ax3.plot(df[["max_dude"]], "g-")
     ax3.tick_params(axis='y', labelcolor="green")
     ax3.spines['right'].set_position(('outward', 40))
-
-    plt.style.use('seaborn')
+    
+    
     plt.tight_layout()
     # df[["gen", 
     #     "max_fit", 
@@ -101,13 +106,27 @@ def main():
     #     #"entropy"
     #     ]].plot(x="gen")
 
-    plt.show()
+def fit_vs_dude(df):
+   # ax4 = plt.subplot()
+
+   # ax4.set_xlabel("Max_Dude")
+   # ax4.set_ylabel('Max Fitness')
+   # x = df[["max_dude"]]
+   # y = df[["max_fit"]]
+   # plt.ylabel("max_fit")
+    df[["max_dude", "max_fit"]].plot(x="max_dude", y="max_fit")
+
+# WORK IN PORGRESS
+# def occu_histo(df):
+#     bins_list = [0]
+#     for i in range(1, 50):
+#         bins_list.append(n_pop/i)
+#     #ax = plt.hist(df[["occupancy"]], bins = bins_list)
+#     aw = df[["occupancy"]].drop(labels = "occupancy", axis = 1)
+#     ax = np.histogram(aw, bins = 'auto')
+#     plt.plot(ax)
 
     
- #   df = df.drop(columns=["gen"])
- #   df.plot()
- #   plt.show()
-
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
     fit_list = calc_pop_fitness(pop)
@@ -124,7 +143,7 @@ def advance_one_generation(gen, pop):
     # global data_template
     data_template.append({"gen" : gen,
                           "max_fit" : max_fit,
-                          "max_dude" : max_index,
+                          "max_dude" : max_dude,
                           "float_max_dude" : float_to_bin(max_dude),
                           "elite_avg_fit" : elite_avg_fit,
                           "avg_fit" : avg_fit,
