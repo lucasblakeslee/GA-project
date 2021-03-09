@@ -16,7 +16,12 @@ from sys import exit
 import sys
 import os
 import shortuuid
+import numpy as np
+
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.path as path
+import matplotlib.animation as animation
 
 # how much do we shift the exponentials in the sin */+ exp fitness
 # functions
@@ -39,18 +44,19 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 4
+n_pop = 400
 assert(n_pop % 2 == 0)
 # define an "oscillation scale" which is the typical distance between
 # the sin() peaks (i.e. the period!) this is then used to define
 # "mutation rate" and entropy bin sizes for drift mutation
-oscillation_scale = 40*math.pi
+oscillation_scale = 80*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 100
+num_generations = 10000
 global data_template
-data_template= []
+data_template = []
+occupancy_dataframe = []
 
 # add to read
 
@@ -71,13 +77,29 @@ def main():
     df = pd.DataFrame(data_template, index=range(num_generations))
     df.to_csv(f'data_{random_name}.txt', header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
     print(f'data_{random_name}.txt')
+
+    ocpdf = pd.DataFrame(occupancy_dataframe, index=range(num_generations))
+    print(ocpdf)
     main_graph(df)
+    make_histogram(df, num_generations)
     fit_vs_dude(df)
-    #occu_histo(df)
+    # df[["gen", 
+    #     "max_fit", 
+    #     #"elite_avg_fit",
+    #     "avg_fit", 
+    #     #"entropy"
+    #     ]].plot(x="gen")    
     plt.show()
 
+    
+    
+ #   df = df.drop(columns=["gen"])
+ #   df.plot()
+ #   plt.show()
+
 def main_graph(df):
-    fig, ax1= plt.subplots()
+    plt.style.use('seaborn')
+    fig, ax1 = plt.subplots()
 
     ax1.set_xlabel("gen")
     ax1.set_ylabel('Fitness')
@@ -96,37 +118,19 @@ def main_graph(df):
     ax3.plot(df[["max_dude"]], "g-")
     ax3.tick_params(axis='y', labelcolor="green")
     ax3.spines['right'].set_position(('outward', 40))
-    
-    
-    plt.tight_layout()
-    # df[["gen", 
-    #     "max_fit", 
-    #     #"elite_avg_fit",
-    #     "avg_fit", 
-    #     #"entropy"
-    #     ]].plot(x="gen")
+
+
+def make_histogram(df, num_generations):
+    plt.figure()
+    for i in range(num_generations):
+        data = df.iloc[i, 7]
+        plt.hist(data, density=False, bins=40)
+        plt.ylabel('no. of individuals with this occupancy')
+        plt.xlabel('occupancy')
 
 def fit_vs_dude(df):
-   # ax4 = plt.subplot()
+    df[["max_dude", "max_fit"]].plot(x="max_dude")
 
-   # ax4.set_xlabel("Max_Dude")
-   # ax4.set_ylabel('Max Fitness')
-   # x = df[["max_dude"]]
-   # y = df[["max_fit"]]
-   # plt.ylabel("max_fit")
-    df[["max_dude", "max_fit"]].plot(x="max_dude", y="max_fit")
-
-# WORK IN PORGRESS
-# def occu_histo(df):
-#     bins_list = [0]
-#     for i in range(1, 50):
-#         bins_list.append(n_pop/i)
-#     #ax = plt.hist(df[["occupancy"]], bins = bins_list)
-#     aw = df[["occupancy"]].drop(labels = "occupancy", axis = 1)
-#     ax = np.histogram(aw, bins = 'auto')
-#     plt.plot(ax)
-
-    
 def advance_one_generation(gen, pop):
     """Calculates fitness for each person and return them in a list."""
     fit_list = calc_pop_fitness(pop)
@@ -150,6 +154,7 @@ def advance_one_generation(gen, pop):
                           "entropy" : entropy,
                           "occupancy" : sorted(occupancy, reverse=True)[:20]})
     print_pop_stats(gen, pop, fit_list)
+    occupancy_dataframe.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
     return new_pop
