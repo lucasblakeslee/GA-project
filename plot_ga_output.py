@@ -22,6 +22,8 @@ def plot_runfile(fname):
     print(f'# plotting GA run from file {fname}')
     gens, max_fit, avg_fit, elite_avg_fit, entropy = load_file(fname)
     fig, axs = plt.subplots(2, 1)
+    suptitle = fig.suptitle(f'GA output file {fname}', fontsize='x-large')
+    suptitle.set_y(0.98)
     axs[0].plot(gens, max_fit, gens, avg_fit, gens, elite_avg_fit)
     axs[0].set_xlim(0, gens.size - 1)
     axs[0].set_xlabel('generation')
@@ -31,8 +33,9 @@ def plot_runfile(fname):
     axs[1].set_xlim(0, gens.size - 1)
     axs[1].set_ylabel('entropy')
 
+    fig.subplots_adjust(top=0.65)
     fig.tight_layout()
-
+    fig.savefig(f'{fname}.pdf')
 
 def load_file(fname):
     # gens, mf, af, eaf, entropy = np.loadtxt(fname, usecols=[1,5,6,7,8])
