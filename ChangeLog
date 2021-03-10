@@ -1,3 +1,10 @@
+2021-03-10  Mark Galassi  <mark@galassi.org>
+
+	* plot_ga_output.py: new program which loads the ouput files from
+	GA-poly-max.py and gives a visualization.  At this time it shows
+	two aligned plots of fitness vs. generation and entropy
+	vs. generation.
+
 2021-03-03  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py (calc_entropy_drift, print_pop_stats)
