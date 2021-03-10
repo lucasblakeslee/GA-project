@@ -1,5 +1,8 @@
 2021-03-10  Mark Galassi  <mark@galassi.org>
 
+	* plot_ga_output.py (plot_runfile): added a plot for the position
+	of the object.
+
 	* plot_ga_output.py (plot_runfile): added a title to each plot
 	window.  Also added saving this plot to a pdf file.
 
