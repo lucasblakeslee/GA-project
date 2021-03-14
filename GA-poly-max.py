@@ -53,7 +53,7 @@ oscillation_scale = 80*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 10000
+num_generations = 1000
 global data_template
 data_template = []
 occupancy_dataframe = []
@@ -78,11 +78,11 @@ def main():
     df.to_csv(f'data_{random_name}.txt', header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
     print(f'data_{random_name}.txt')
 
-    ocpdf = pd.DataFrame(occupancy_dataframe, index=range(num_generations))
-    print(ocpdf)
-    main_graph(df)
-    make_histogram(df, num_generations)
-    fit_vs_dude(df)
+    # ocpdf = pd.DataFrame(occupancy_dataframe, index=range(num_generations))
+    # print(ocpdf)
+    # main_graph(df)
+    # make_histogram(df, num_generations)
+    # fit_vs_dude(df)
     # df[["gen", 
     #     "max_fit", 
     #     #"elite_avg_fit",
