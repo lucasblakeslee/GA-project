@@ -1,3 +1,11 @@
+2021-03-14  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: adjusted parameters to get some good entropy
+	runs.  Also started modifying the drift entropy so that the range
+	of x is a bit more uniform even when the population variety
+	shrinks.  Also started commenting out the data frame plotting
+	approach in favor of the separate program.
+
 2021-03-10  Mark Galassi  <mark@galassi.org>
 
 	* plot_ga_output.py (plot_runfile): added a plot for the position

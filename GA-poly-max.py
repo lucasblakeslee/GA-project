@@ -18,10 +18,12 @@ import os
 import shortuuid
 import numpy as np
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.path as path
-import matplotlib.animation as animation
+# import matplotlib.pyplot as plt
+# import matplotlib.patches as patches
+# import matplotlib.path as path
+# import matplotlib.animation as animation
+
+verbose = False
 
 # how much do we shift the exponentials in the sin */+ exp fitness
 # functions
@@ -44,19 +46,19 @@ n_poly_coefs = len(poly_coefs)
 # set run_seed to an int to force a seed (and get a reproducible run),
 # or None to have a different random sequence eacth time
 random_seed = 123456
-n_pop = 400
+n_pop = 2000
 assert(n_pop % 2 == 0)
 # define an "oscillation scale" which is the typical distance between
 # the sin() peaks (i.e. the period!) this is then used to define
 # "mutation rate" and entropy bin sizes for drift mutation
-oscillation_scale = 80*math.pi
+oscillation_scale = 40*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-num_generations = 10000
-global data_template
-data_template = []
-occupancy_dataframe = []
+num_generations = 1400
+# global data_template
+# data_template = []
+# occupancy_dataframe = []
 
 # add to read
 
@@ -65,14 +67,16 @@ def main():
     # NOTE: you can force the seed to get reproducible runs.
     # comment the random.seed() call to get different runs each time.
     gen_fname = get_gen_info_fname()
-    print_metadata(gen_fname)
+    print_metadata("", gen_fname)
+    print_metadata(gen_fname, gen_fname)
     random.seed(random_seed)
     np.random.seed(random_seed)
     population = make_initial_pop(n_pop)
-    data = np.empty(10000)
+    # data = np.empty(10000)
     for gen in range(num_generations):
         new_pop = advance_one_generation(gen, population)
         population = new_pop
+    return
     global df
     df = pd.DataFrame(data_template, index=range(num_generations))
     df.to_csv(f'data_{random_name}.txt', header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
@@ -145,16 +149,16 @@ def advance_one_generation(gen, pop):
     # entropy, occupancy = calc_entropy(gen, pop)
     entropy, occupancy = calc_entropy_drift(gen, pop)
     # global data_template
-    data_template.append({"gen" : gen,
-                          "max_fit" : max_fit,
-                          "max_dude" : max_dude,
-                          "float_max_dude" : float_to_bin(max_dude),
-                          "elite_avg_fit" : elite_avg_fit,
-                          "avg_fit" : avg_fit,
-                          "entropy" : entropy,
-                          "occupancy" : sorted(occupancy, reverse=True)[:20]})
+    # data_template.append({"gen" : gen,
+    #                       "max_fit" : max_fit,
+    #                       "max_dude" : max_dude,
+    #                       "float_max_dude" : float_to_bin(max_dude),
+    #                       "elite_avg_fit" : elite_avg_fit,
+    #                       "avg_fit" : avg_fit,
+    #                       "entropy" : entropy,
+    #                       "occupancy" : sorted(occupancy, reverse=True)[:20]})
     print_pop_stats(gen, pop, fit_list)
-    occupancy_dataframe.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
+    # occupancy_dataframe.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
     return new_pop
@@ -177,7 +181,9 @@ def print_pop_stats(gen, pop, fit_list):
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
                      + f'   {float_to_bin(max_dude)}   {max_fit:20.26g}'
                      + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
-    print(line_to_print + '   ')
+    if verbose:
+        print(line_to_print)
+        sys.stdout.flush()
     with open(get_gen_info_fname(), 'a') as f:
         f.write(line_to_print + '\n')
         f.flush()
@@ -202,14 +208,18 @@ def calc_fitness(x):
     fitness function.  sometimes we also multiply it by a wide
     gaussian envelope to avoid fitness values that are too extreme
     """
+    if not math.isfinite(x):
+        return -sys.float_info.max
+    return fit_sin_on_gaussian(x)
     # fit = 0
     # for i in range(n_poly_coefs):
     #     fit += poly_coefs[i] * x**i
     # # now multiply by a gaussian envelope
     # # fit = fit * math.exp(-x**2 / 100.0)
     # fit = math.cos(x-40)+10*math.exp(-(x-40)**2/5000)
-    if not math.isfinite(x):
-        return -sys.float_info.max
+    # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
+
+def fit_sin_on_gaussian(x):
     # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
     xp = x - shift
     fit = sin(2*math.pi*xp/oscillation_scale) * exp(-xp**2/20000) + 100*exp(-xp**2/1000000) + 2*sin(2*math.pi*xp/oscillation_scale)
@@ -309,6 +319,7 @@ def calc_entropy(gen, pop):
     shannon_entropy = occupancy_list2entropy(occupancy)
     return shannon_entropy, occupancy
 
+first_pop_spread = -1.0
 def calc_entropy_drift(gen, pop):
     """Entropy calculation that is appropriate for drift mutations.  The
     main difference is that instead of assuming unique population
@@ -319,14 +330,23 @@ def calc_entropy_drift(gen, pop):
     n_bins = n_pop
     pmin = np.min(pop)
     pmax = np.max(pop)
-    pop_spread = pmax - pmin
-    bin_width = pop_spread / n_bins
+    this_pop_spread = pmax - pmin
+    this_center = pmin + (pmax - pmin)/2.0
+    canonical_pop_spread = 30 * oscillation_scale
+    canonical_pmin = this_center - canonical_pop_spread / 2.0
+    canonical_pmax = this_center + canonical_pop_spread / 2.0
+    global first_pop_spread
+    if first_pop_spread == -1:
+        first_pop_spread = this_pop_spread
+    if verbose:
+        print(f'#POP_SPREAD: {pmin}   {pmax}   {this_pop_spread}   {oscillation_scale}'
+              + '   {this_pop_spread / oscillation_scale}')
+    bin_width = canonical_pop_spread / n_bins
     occupancy = [0]*n_bins
     for i in range(n_bins):
-        x_left_edge = pmin + i * bin_width
-        x_right_edge = pmin + (i+1) * bin_width
+        x_left_edge = canonical_pmin + i * bin_width
+        x_right_edge = canonical_pmin + (i+1) * bin_width
         occupancy[i] = count_pop_in_bin(pop, x_left_edge, x_right_edge)
-    print('DRIFT_occupancy:', occupancy)
     entropy = occupancy_list2entropy(occupancy)
     return entropy, occupancy
 
@@ -369,7 +389,7 @@ def mate_drift(p1, p2):
     c2 = (p1 + p2) / 2.0
     c2 += (random.random() - 0.5) * mutation_rate
     # c2 += np.random.lognormal(mutation_rate * 100)
-    if random.random() < 0.01:   # small % of the time make shift 100 times bigger
+    if random.random() < 0.005:   # small % of the time make shift 100 times bigger
         c1 += (random.random() - 0.5) * 5*mutation_rate
         c2 += (random.random() - 0.5) * 5*mutation_rate
     return c1, c2
@@ -444,7 +464,7 @@ def run_tests():
     x_after_processing = bin_to_float(xstr)
     print('from_str_to_float:', x_after_processing)
 
-def print_metadata(fname):
+def print_metadata(fname, gen_fname):
     """Print some information about the run using the "low effort
     metadata" approach, described at
     https://programmingforresearch.wordpress.com/2020/06/07/low-effort-metadata-lem/
@@ -452,10 +472,10 @@ def print_metadata(fname):
     from datetime import datetime
     my_date = datetime.now()
     dt_str = my_date.isoformat()
-    with open(fname, 'a') as f:
-        f.write(f"""##COMMENT: Genetic algorithm run
+    meta_str = (f"""##COMMENT: Genetic algorithm run
 ##COMMAND_LINE: {sys.argv.__str__()}
 ##RUN_DATETIME: {dt_str}
+##OUTPUT_FILENAME: {gen_fname}
 ##SHIFT: {shift}
 ##POLY_COEFS: {poly_coefs.__str__()}
 ##random_seed: {random_seed}
@@ -470,8 +490,13 @@ def print_metadata(fname):
 ##COLUMN5: highest fitness
 ##COLUMN6: elite average fitness
 ##COLUMN7: average fitness
-##COLUMN8: population entroypy
+##COLUMN8: population entropy
 """)
+    if len(fname) == 0:         # no file: print to stdout
+        sys.stdout.write(meta_str)
+    else:
+        with open(fname, 'a') as f:
+            f.write(meta_str)
 
 def print_poly_for_plot(fname):
     x = shift - 1000
@@ -503,12 +528,14 @@ def make_initial_pop(n_pop):
     #     x = bin_to_float(bitstr)
     #     print(bitstr, x)
     #     population[i] = x
-    population = np.random.uniform(low=70000.0, high=85000.0, size=n_pop)
+    # population = np.random.uniform(low=70000.0, high=85000.0, size=n_pop)
+    # population = np.random.uniform(low=80000.0, high=80000.0, size=n_pop)
     # population = np.random.uniform(low=-10000002,
     #                                high=-10000001,
     #                                size=n_pop)
 
     # population = np.full(n_pop, -1000.0)
+    population = np.full(n_pop, 85000.0)
     # population = np.random.uniform(low=-200000.0000000001, 
     #                                # high=100000.0000000002,
     #                                high=-100000.0000000002,

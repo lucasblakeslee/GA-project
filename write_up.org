@@ -1,7 +1,7 @@
 -*- mode: org -*-
 #+STARTUP: showall
 
-* Entorpy in Evolutionary Algorithms
+* Entropy in Evolutionary Algorithms
 * Abstract:
 Genetic algorithms are a type of optimization algorithm based on natural selection. GAs have yielded
 impressive results in certain practical problems, yet there is still more to be understood about them
