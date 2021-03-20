@@ -1,5 +1,9 @@
 2021-03-20  Mark Galassi  <mark@galassi.org>
 
+	* GA-gen-info_pid3095791.out.pdf:
+	* GA-gen-info_pid3095791.metadata: added a provisional reference
+	figure.
+
 	* README.md: added a bit more about how to generate the paper.
 
 	* write_up.tex: some structural adaptation of the write-up.
