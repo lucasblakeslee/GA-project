@@ -16,7 +16,9 @@
 \usepackage{hyperref}
 
 \date{\today}
-\title{}
+\title{Entropy in Evolutionary Algorithms}
+\author{Lucas Blakeslee\footnote{\texttt{lqblakeslee@gmail.com}},
+  Aengus McGuinness\footnote{\texttt{aengus82520@gmail.com}}}
 \hypersetup{
  pdfauthor={},
  pdftitle={},
@@ -24,21 +26,56 @@
  pdfsubject={},
  pdfcreator={Emacs 27.1 (Org mode 9.3)}, 
  pdflang={English}}
+
 \begin{document}
+\maketitle
+%% \tableofcontents
 
-\tableofcontents
 
--\textbf{- mode: org -}-
-
-\section{Entorpy in Evolutionary Algorithms}
 \label{sec:org26f53e0}
-\section{Abstract:}
+\begin{abstract}
 \label{sec:orga17da23}
-Genetic algorithms are a type of optimization algorithm based on natural selection. GAs have yielded impressive results in certain practical problems, yet there is still more to be understood about them on a theoretical level. This [paper/exercise] seeked to analyze how entropy changes throughout the evolution that occurs in a genetic algorithm. A simple GA designed to find the maxima of a polynomial was constructed, and diversity was tracked as a measure of entropy.
+
+Genetic algorithms (GAs) are an optimization technique inspired by
+natural selection. GAs have yielded good results in certain practical
+problems, yet there is still more to be understood about their
+behavior on a theoretical level. One approach is to look at the
+evolutionary process from the point of view of statistical mechanics,
+and interpreting jumps in fitness as phase transitions. Toward this
+goal we examine the behavior of \emph{entropy} in a GA that optimizes
+a simple function.  We find that entropy increases as a new species
+diversifies, but its upper bound decreases with most phase
+transitions (which correspond to evolutionary steps).
+\end{abstract}
+
+
+%% -\textbf{- mode: org -}-
+
 
 \section{Motivation:}
 \label{sec:org16abecd}
-Genetic algorithms (GAs) are stochastic search algorithms based on the process of natural evolution, solving for the 'fittest' solutions to a problem. GAs are optimization algorithms, designed to maximize or minimize certain functions. GAs are much more efficient than random or exhaustive search algorithms (Kinnear, 1994), however, they do not scale well with complexity (Radcliffe \& Surry, 1995). While specifics may vary, there are some processes universal to GAs, which are: population → fitness evaluation → selection → crossover → mutation, repeat. Each organism in the population has its own 'chromosome,' or set of characteristics. Here is where the resemblance to biological evolution begins to weaken. The process continues to occur either until some condition for termination has been met, or until a pre-specified number of iterations has elapsed. Genetic algorithms have been used in a variety of practical applications, from making "evolved antennae" for spacecrafts and satellites to the estimation of heat flux between sea ice and the atmosphere to predictive economic models. Entropy and evolution have been often explored together, with research on the subject going as far back as the 1870s, though Schrödinger's 1944 book \emph{What is life?} sparked a wave of modern interest. Here it was wondered how entropy would change over time in a genetic algorithm, in order to attain a better theoretical grasp of how they function.
+Genetic algorithms (GAs) are stochastic search algorithms based on the
+process of natural evolution, solving for the 'fittest' solutions to a
+problem. GAs are optimization algorithms, designed to maximize or
+minimize certain functions. GAs are much more efficient than random or
+exhaustive search algorithms (Kinnear, 1994), however, they do not
+scale well with complexity (Radcliffe \& Surry, 1995). While specifics
+may vary, there are some processes universal to GAs, which are:
+population → fitness evaluation → selection → crossover → mutation,
+repeat. Each organism in the population has its own 'chromosome,' or
+set of characteristics. Here is where the resemblance to biological
+evolution begins to weaken. The process continues to occur either
+until some condition for termination has been met, or until a
+pre-specified number of iterations has elapsed. Genetic algorithms
+have been used in a variety of practical applications, from making
+"evolved antennae" for spacecrafts and satellites to the estimation of
+heat flux between sea ice and the atmosphere to predictive economic
+models. Entropy and evolution have been often explored together, with
+research on the subject going as far back as the 1870s, though
+Schrödinger's 1944 book \emph{What is life?} sparked a wave of modern
+interest. Here it was wondered how entropy would change over time in a
+genetic algorithm, in order to attain a better theoretical grasp of
+how they function.
 
 \section{Hypothesis:}
 \label{sec:org26a3be1}
@@ -57,6 +94,19 @@ The population of 10,000 underwent the standard evalutation, selection, crossove
 \section{Results:}
 \label{sec:orged0917a}
 [I'm a little unclear on what our actual results were]
+
+
+\begin{figure}
+  \centering{}
+  \resizebox{0.5\linewidth}{!}{%
+    \includegraphics{GA-gen-info_pid3095791.out.pdf}
+  }
+  \caption{One example of evolution FIXME add more.}
+  \label{fig:multi-step}
+\end{figure}
+
+\begin{figure}
+\end{figure}
 
 \section{Discussion:}
 \label{sec:org7999995}

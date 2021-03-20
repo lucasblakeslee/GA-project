@@ -1,3 +1,9 @@
+2021-03-20  Mark Galassi  <mark@galassi.org>
+
+	* README.md: added a bit more about how to generate the paper.
+
+	* write_up.tex: some structural adaptation of the write-up.
+
 2021-03-14  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py: adjusted parameters to get some good entropy
