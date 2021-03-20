@@ -55,13 +55,7 @@ oscillation_scale = 40*math.pi
 mutation_rate = oscillation_scale / 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
-<<<<<<< HEAD
 num_generations = 1400
-=======
-num_generations = 1000
-global data_template
-data_template = []
->>>>>>> refs/remotes/origin/main
 # add to read
 
 def main():
