@@ -1,0 +1,248 @@
+% LICENSE:
+% Creative Commons Attribution-Sharealike 4.0 license (a.k.a. CC BY-SA) (#ccbysa).
+% See the file LICENSE in this source distribution.
+
+\documentclass[10pt,aspectratio=169]{beamer}
+%% \documentclass[handout,10pt,aspectratio=169]{beamer}
+
+\newcommand{\pitem}{\pause\item}
+
+\newenvironment{colblock}[3]{%
+  \setbeamercolor{block body}{#2}
+  \setbeamercolor{block title}{#3}
+  \begin{block}{#1}}{\end{block}}
+
+%% Red Block with only Body
+\newenvironment{AlternativeRBBlock}[0]{%
+  \setbeamercolor{block body}{bg=red!20}
+  \begin{block}{}}{\end{block}}
+
+%% red block with only body
+\newenvironment{rbblock}[0]{%
+  \begin{colblock}{}{bg=red!20}{bg=green}}{\end{colblock}}
+
+
+\setbeamersize{description width=0.35cm}
+
+%% \usepackage[backend=biber,style=numeric-comp,sorting=none]{biblatex}
+%% \addbibresource{2020-CS-PD.bib}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamercolor{block body alerted}{bg=alerted text.fg!10}
+\setbeamercolor{block title alerted}{bg=alerted text.fg!20}
+\setbeamercolor{block body}{bg=structure!10}
+\setbeamercolor{block title}{bg=structure!20}
+\setbeamercolor{block body example}{bg=green!10}
+\setbeamercolor{block title example}{bg=green!20}
+
+% add outline at the start of each new section
+\AtBeginSection[]{
+ \begin{frame}{Outline}
+   \tableofcontents[currentsection]
+ \end{frame}
+}
+
+\AtBeginSubsection[]{
+ \begin{frame}{Outline}
+   \tableofcontents[currentsubsection]
+ \end{frame}
+}
+
+\usepackage{upquote,textcomp}   % get correct ascii quotes in verbatim
+\usepackage{cclicenses}
+
+% allow positioning of one block over another
+\usepackage[absolute,overlay]{textpos}
+% while debugging absolute positions, it can be useful to uncomment
+% the next line
+%% \usepackage[texcoord,grid,gridunit=mm,gridcolor=red!10,subgridcolor=green!10]{eso-pic}
+
+\usepackage[24hr,iso]{datetime}
+\renewcommand{\dateseparator}{-}
+
+\usepackage{bookmark}
+\usepackage{etoolbox}
+\usepackage{relsize}
+
+%% don't put those navigation buttons at the bottom of the slide -
+%% they never really get used
+\beamertemplatenavigationsymbolsempty
+
+%% \logo{\includegraphics[height=1cm]{algorithm-design-manual.png}}
+
+%% for source code listings
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{lmodern}
+\usepackage{moresize}
+\usepackage[procnames]{listings}
+%% special instructions to make sure we can paste from pdf
+\makeatletter
+\def\addToLiterate#1{\edef\lst@literate{\unexpanded\expandafter{\lst@literate}\unexpanded{#1}}}
+\lst@Key{add to literate}{}{\addToLiterate{#1}}
+\makeatother
+
+%% customization of listings
+\usepackage{color}
+
+%% colors for various parts of the syntax
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{commentstyle=\color{mygreen}}
+\lstset{keywordstyle=\color{blue}}
+\lstset{rulecolor=\color{black}}
+\lstset{stringstyle=\color{mymauve}}
+
+\lstset{framexleftmargin=5mm, frame=shadowbox, rulesepcolor=\color{gray!25}}
+\lstset{breaklines=true}
+\lstset{columns=fullflexible}
+\lstset{keepspaces=true}
+\lstset{showstringspaces=false}
+\lstset{showspaces=false}
+\lstset{extendedchars=false}
+\lstset{literate={-}{-}1}
+\lstset{upquote=true}
+\lstset{add to literate={~}{\ttil}{1}}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{media9}
+
+
+\title{Entropy in Evolutionary Algorithms}
+\subtitle{Statistical mechanics bearing insight into evolution}
+\author{Lucas Blakeslee and Aengus McGuinness}
+\subject{Optimization, Evolution, Genetic Algorithms}
+
+\institute[SF High]{
+  Santa Fe High School \\
+  Institute for Computing in Research}
+\date{2021-03-20 \\
+  {\smaller[2] Last built \today{}T\currenttime } \\
+  \smallskip
+      {\smaller[4] (You may redistribute these slides with their \LaTeX\
+        \vspace{-0.1cm}
+        source code under the terms of the \\
+        Creative Commons Attribution-ShareAlike 4.0 public license)}
+}
+
+\begin{document}
+
+\section*{Frontmatter}
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\begin{frame}{Outline} 
+  \tableofcontents
+\end{frame}
+
+
+\section{Goals}
+
+\begin{frame}{Goals and path}
+  In the educational industrial complex we are required to state our
+  goals before we start.\\
+  It might even be a good idea.
+
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Goals}
+        \begin{itemize}
+          \pause\item
+          Have a broad view of University curriculum, successes and
+          limitations, state of industry.\\
+          \pause\item
+          Awareness of grand challenges \\in software engineering.\\
+          \pause\item
+          Awareness of current approaches \\ to address those challenges.\\
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \pause
+      \begin{block}{The meandering path}
+        \begin{itemize}
+          \pause\item
+          My path is largely historical because of \\ my personal inclination
+          to use history \\ to give perspective.\\
+          \pause\item
+          We need perspective so we are not tossed about by the short-term
+          interest of industry.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \pause
+  \begin{block}{Style}
+    \begin{itemize}
+    \item
+      Slides are placeholders for me to then tell stories.  \\ \pause
+      I hope you will talk and tell stories too. \\ \pause
+    \item
+      But also: I join the modern quest to give a seminar made
+      entirely of xkcd slides.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\part{Part I, day 1}
+
+\section{Setting the stage}
+
+\begin{frame}{A picture}
+  \begin{columns} % This creates a frame with multiple columns.
+    % The first column will be 50% as wide as the width of text on the page.
+    \begin{column}{0.4\textwidth}
+      % Beamer doesn't like to display .eps files. This .png was
+      % converted from .eps using Adobe Acrobat. The file graph1.png
+      % should be in the same folder as the .tex file.
+      \includegraphics[width=\textwidth]{GA-gen-info_pid3095791.out.pdf}
+                      {\tiny Margaret Hamilton, who led the MIT
+                        team that wrote the Apollo on-board
+                        software in the 1960s, is one of the
+                        coiners of the term ``software
+                        engineering''.\par}
+    \end{column}
+    
+    \pause
+
+    \begin{column}{0.6\textwidth}
+      \includegraphics[width=0.75\textwidth]{GA-gen-info_pid3095791.out.pdf}
+      \\
+      \pause
+      Most of the computer science department courses.\\
+      \pause
+      Less math.\\
+      \pause
+      Process and management classes.\\
+      \pause
+      ISO's ``Software Engineering Body of Knowledge'' (SWEBOK).
+      
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+
+%% \input{curriculum}
+
+%% \input{programming-languages}
+
+%% \part{Part I, day 2}
+
+%% \input{pedagogical}
+
+%% \input{tools}
+
+%% \input{bones-of-the-world}
+
+%% %% \input{extras}
+
+%% %% \input{references}
+
+\end{document}

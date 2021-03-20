@@ -16,6 +16,12 @@ latexmk -pdf GA-entropy.tex
 
 to generate GA-entropy.pdf
 
+## Building the slides
+
+latexmk -pdf GA-entropy-slides.tex
+
+will generate GA-entropy-slides.pdf
+
 ## Prerequisites
 
 The python packages we used for the code are:

@@ -1,5 +1,8 @@
 2021-03-20  Mark Galassi  <mark@galassi.org>
 
+	* GA-entropy-slides.tex, README.md: a simple start to a beamer
+	presentation.
+
 	* GA-gen-info_pid3095791.out.pdf:
 	* GA-gen-info_pid3095791.metadata: added a provisional reference
 	figure.
