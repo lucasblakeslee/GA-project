@@ -44,10 +44,10 @@ def plot_runfile(fname):
 def load_file(fname):
     # gens, mf, af, eaf, entropy = np.loadtxt(fname, usecols=[1,5,6,7,8])
     data = np.loadtxt(fname, usecols=[1,3,5,6,7,8])
-    print(data)
-    print(data.shape)
-    print(data[0])
-    print(data[0].shape)
+    # print(data)
+    # print(data.shape)
+    # print(data[0])
+    # print(data[0].shape)
     gens, fittest, mf, af, eaf, entropy = np.transpose(data)
     return gens, fittest, mf, af, eaf, entropy
 

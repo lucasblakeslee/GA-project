@@ -1,3 +1,9 @@
+2021-03-21  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: reintroduced some stashed changes that set
+	function names for various entropy calculations, mutations, and
+	initial distributions.
+
 2021-03-20  Mark Galassi  <mark@galassi.org>
 
 	* GA-entropy-slides.tex, README.md: a simple start to a beamer
