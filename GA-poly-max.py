@@ -17,12 +17,6 @@ import os
 import shortuuid
 import numpy as np
 from scipy.stats import lognorm
-# from numpy.random import default_rng
-
-# import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
-# import matplotlib.path as path
-# import matplotlib.animation as animation
 
 verbose = 0
 
