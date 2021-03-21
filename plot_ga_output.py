@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 
+import sys
+import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import sys
-import glob
+from matplotlib.font_manager import FontProperties
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] in ('--help', '-h'):
@@ -17,12 +18,24 @@ def main():
         flist = glob.glob('GA-gen-info_pid*.out')
     for runfile in flist:
         fig, axtxt, axs = prepare_plots(runfile)
+        present_metadata(runfile, axtxt)
         plot_runfile(runfile, fig, axs)
-        t = "This is a really long string that I'd rather have wrapped so that it"\
-            " doesn't go outside of the figure, but if it's long enough it will go"\
-            " off the top or bottom!"
-        axtxt.text(0, 0, t, ha='left', rotation=0, wrap=True)
+        # t = "This is a really long string that I'd rather have wrapped so that it"\
+        #     " doesn't go outside of the figure, but if it's long enough it will go"\
+        #     " off the top or bottom!"
+        # axtxt.text(0, 0, t, ha='left', rotation=0, wrap=True)
     plt.show()
+
+def present_metadata(fname, ax):
+    """Loads metadata from a file and shows it in an ax object."""
+    metadata = load_LEM(fname)
+    n_lines = len(metadata.keys())
+    font0 = FontProperties()
+    font = font0.copy()
+    font.set_family('monospace')
+    for i, key in enumerate(metadata.keys()):
+        ax.text(0.02, 1.01 - (i+1)/n_lines, key + ': ' + metadata[key], ha='left',
+                fontproperties=font)
 
 def prepare_plots(fname):
     # fig, axs = plt.subplots(3, 2)
@@ -30,8 +43,6 @@ def prepare_plots(fname):
     gs = gridspec.GridSpec(3, 2)
     axtxt = fig.add_subplot(gs[:, -1])
     axs = [fig.add_subplot(gs[i, 0]) for i in range(3)]
-    print(axtxt)
-    print(axs)
     suptitle = fig.suptitle(f'GA output file {fname}', fontsize='x-large')
     suptitle.set_y(0.98)
     return fig, axtxt, axs
@@ -59,14 +70,22 @@ def plot_runfile(fname, fig, axs):
     fig.savefig(f'{fname}.pdf')
 
 def load_file(fname):
-    # gens, mf, af, eaf, entropy = np.loadtxt(fname, usecols=[1,5,6,7,8])
     data = np.loadtxt(fname, usecols=[1,3,5,6,7,8])
-    # print(data)
-    # print(data.shape)
-    # print(data[0])
-    # print(data[0].shape)
     gens, fittest, mf, af, eaf, entropy = np.transpose(data)
     return gens, fittest, mf, af, eaf, entropy
+
+def load_LEM(fname):
+    """Loads the LEM (low effort metadata) from file fname."""
+    LEM_dict = {}
+    with open(fname, 'r') as f:
+        for line in f.readlines():
+            if line[:2] != '##':
+                return LEM_dict
+            line = line.strip()
+            key, val = line[2:].split(':', 1)
+            assert(not key in LEM_dict)
+            LEM_dict[key.strip()] = val.strip()
+
 
 if __name__ == '__main__':
     main()
