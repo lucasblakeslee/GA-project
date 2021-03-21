@@ -33,6 +33,7 @@ def present_metadata(fname, ax):
     font0 = FontProperties()
     font = font0.copy()
     font.set_family('monospace')
+    font.set_size('xx-small')
     for i, key in enumerate(metadata.keys()):
         ax.text(0.02, 1.01 - (i+1)/n_lines, key + ': ' + metadata[key], ha='left',
                 fontproperties=font)

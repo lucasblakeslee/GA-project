@@ -1,5 +1,8 @@
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
+	* plot_ga_output.py: adjusted sizes so that we now get a
+	reasonable fit.
+
 	* plot_ga_output.py (load_LEM, present_metadata): metadata is now
 	in there, but the overall window size does not currently hold it
 	in.
