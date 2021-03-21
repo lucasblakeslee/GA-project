@@ -1,5 +1,8 @@
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
+	* GA-poly-max.py: separated out the entropy calculation into
+	selectable functions, so that now it is reported in the metadata.
+
 	* plot_ga_output.py: adjusted sizes so that we now get a
 	reasonable fit.
 

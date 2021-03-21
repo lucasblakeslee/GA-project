@@ -18,7 +18,7 @@ import shortuuid
 import numpy as np
 from scipy.stats import lognorm
 
-verbose = 0
+verbose = 2
 
 # how much do we shift the exponentials in the sin */+ exp fitness
 # functions
@@ -26,7 +26,7 @@ shift = 87500.3
 
 # don't change these functions here; change them in main()
 global initial_func, mate_func, fit_func
-initial_func = mate_func = fit_func = None
+initial_func = mate_func = fit_func = entropy_func = None
 
 ## parameters of the run
 # set run_seed to an int to force a seed (and get a reproducible run),
@@ -39,20 +39,21 @@ assert(n_pop % 2 == 0)
 # "mutation rate" and entropy bin sizes for drift mutation
 oscillation_scale = 80*math.pi
 mutation_rate = 0.10
-mutation_rate_drift = oscillation_scale / 5.0
-lognormal_mean = 1
-lognormal_sigma = 4
+mutation_rate_drift = oscillation_scale / 3.0
+lognormal_mean = 0.1
+lognormal_sigma = 2.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 1400
 # add to read
 
 def main():
-    global initial_func, mate_func, fit_func
+    global initial_func, mate_func, fit_func, entropy_func
     # Change these functions here
-    initial_func = make_initial_rnd_0      # mate_bitflip, mate_drift, mate_drift_lognormal
-    mate_func = mate_drift_lognormal   # make_initial_all_85000, make_initial_random, ...
-    fit_func = fit_flattop_on_gaussian     # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+    initial_func = make_initial_rnd_0 # make_initial_all_85000, make_initial_random, ...
+    mate_func = mate_drift # mate_bitflip, mate_drift, mate_drift_lognormal
+    fit_func = fit_flattop_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+    entropy_func = calc_entropy_drift_adapt # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
 
     print_fit_func_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.
@@ -92,8 +93,7 @@ def advance_one_generation(gen, pop):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    # entropy, occupancy = calc_entropy(gen, pop)
-    entropy, occupancy = calc_entropy_drift(gen, pop)
+    entropy, occupancy = calc_entropy(gen, pop)
     print_pop_stats(gen, pop, fit_list)
     if verbose >= 1:
         dump_pop(gen, pop, fit_list)
@@ -113,7 +113,7 @@ def make_pop_stats_line(gen, pop, fit_list):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy_drift(gen, pop)
+    entropy, occupancy = calc_entropy(gen, pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
@@ -182,9 +182,9 @@ def fit_flattop_on_gaussian(x):
     xp = x - shift
     # then adjust for keeping a flat region
     xm = xp - xp % (2*oscillation_scale)
-    exp_base = 300*np.exp(-xm**2/1000000.0)
-    flattop_max = exp_base + 10*np.exp(-xm**2/1000000.0)
-    flattop_min = exp_base - 10*np.exp(-xm**2/1000000.0)
+    exp_base = 300*np.exp(-xm**2/2000000.0)
+    flattop_max = exp_base + 10*np.exp(-xm**2/2000000.0)
+    flattop_min = exp_base - 10*np.exp(-xm**2/2000000.0)
     # fit = 100*exp(-xp**2/1000000) + 2*sin(2*math.pi*xp/oscillation_oscillation_scale)
     # now try to figure out a square wave-ish thing that rides on top
     # of the gaussian
@@ -243,7 +243,13 @@ def calc_genetic_distance(p1, p2):
     genetic_distance = np.sum(np.bitwise_xor(array_p1,array_p2))
     return genetic_distance
 
+
 def calc_entropy(gen, pop):
+    entropy, occupancy = entropy_func(gen, pop)
+    return entropy, occupancy
+
+
+def calc_entropy_bits(gen, pop):
     """Calculate the shannon entropy for this population by applying the
     Shannon formula using occupancy of each state in the population."""
     # used_pop tracks the population members that we actually use.
@@ -290,8 +296,7 @@ def calc_entropy(gen, pop):
     shannon_entropy = occupancy_list2entropy(occupancy)
     return shannon_entropy, occupancy
 
-first_pop_spread = -1.0
-def calc_entropy_drift(gen, pop):
+def calc_entropy_drift_adapt(gen, pop):
     """Entropy calculation that is appropriate for drift mutations.  The
     main difference is that instead of assuming unique population
     members, we instead put the population into bins -- i.e. we define
@@ -306,9 +311,6 @@ def calc_entropy_drift(gen, pop):
     canonical_pop_spread = 60 * oscillation_scale
     canonical_pmin = this_center - canonical_pop_spread / 2.0
     canonical_pmax = this_center + canonical_pop_spread / 2.0
-    global first_pop_spread
-    if first_pop_spread == -1:
-        first_pop_spread = this_pop_spread
     if verbose >= 2:
         print(f'#POP_SPREAD: {pmin}   {pmax}   {this_center}   {this_pop_spread}'
               + f'   {canonical_pop_spread}   {oscillation_scale}'
@@ -465,11 +467,13 @@ def print_metadata(fname, gen_fname):
 ##COMMAND_LINE: {sys.argv.__str__()}
 ##RUN_DATETIME: {dt_str}
 ##OUTPUT_FILENAME: {gen_fname}
+##VERBOSE: {verbose}
 ##SHIFT: {shift}
 ##random_seed: {random_seed}
 ##MATE_FUNCTION: {mate_func.__name__}
 ##INITIAL_FUNCTION: {initial_func.__name__}
 ##FITNESS_FUNCTION: {fit_func.__name__}
+##ENTROPY_FUNCTION: {entropy_func.__name__}
 ##MUTATION_RATE: {mutation_rate}
 ##MUTATION_RATE_DRIFT: {mutation_rate_drift}
 ##LORNORMAL_MEAN: {lognormal_mean}

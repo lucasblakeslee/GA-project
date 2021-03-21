@@ -15,7 +15,7 @@ def main():
     if len(sys.argv) > 1:
         flist = sys.argv[1:]
     else:
-        flist = glob.glob('GA-gen-info_pid*.out')
+        flist = sorted(glob.glob('GA-gen-info_pid*.out'))
     for runfile in flist:
         fig, axtxt, axs = prepare_plots(runfile)
         present_metadata(runfile, axtxt)
@@ -39,8 +39,8 @@ def present_metadata(fname, ax):
                 fontproperties=font)
 
 def prepare_plots(fname):
-    # fig, axs = plt.subplots(3, 2)
-    fig = plt.figure(constrained_layout = True)
+    # fig = plt.figure(constrained_layout = True)
+    fig = plt.figure()
     gs = gridspec.GridSpec(3, 2)
     axtxt = fig.add_subplot(gs[:, -1])
     axs = [fig.add_subplot(gs[i, 0]) for i in range(3)]
