@@ -24,20 +24,15 @@ from scipy.stats import lognorm
 # import matplotlib.path as path
 # import matplotlib.animation as animation
 
-verbose = True
+verbose = 0
 
 # how much do we shift the exponentials in the sin */+ exp fitness
 # functions
 shift = 87500.3
 
-#creates unique name for the output file
-random_name = shortuuid.ShortUUID().random(length=5)
-#creates said file
-#open("GA-gen-info_pid{}.out".format(random_name), "x")
-
-mate_func = None      # mate_bitflip, mate_drift, mate_drift_lognormal
-initial_func = None   # make_initial_all_85000, make_initial_random, ...
-fit_func = None     # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+# don't change these functions here; change them in main()
+global initial_func, mate_func, fit_func
+initial_func = mate_func = fit_func = None
 
 ## parameters of the run
 # set run_seed to an int to force a seed (and get a reproducible run),
@@ -51,6 +46,8 @@ assert(n_pop % 2 == 0)
 oscillation_scale = 80*math.pi
 mutation_rate = 0.10
 mutation_rate_drift = oscillation_scale / 5.0
+lognormal_mean = 1
+lognormal_sigma = 4
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 1400
@@ -58,14 +55,16 @@ num_generations = 1400
 
 def main():
     global initial_func, mate_func, fit_func
-    initial_func = make_initial_rnd_0
-    mate_func = mate_drift_lognormal
-    fit_func = fit_flattop_on_gaussian
+    # Change these functions here
+    initial_func = make_initial_rnd_0      # mate_bitflip, mate_drift, mate_drift_lognormal
+    mate_func = mate_drift_lognormal   # make_initial_all_85000, make_initial_random, ...
+    fit_func = fit_flattop_on_gaussian     # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+
     print_fit_func_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.
     # comment the random.seed() call to get different runs each time.
     gen_fname = get_gen_info_fname()
-    print_metadata("", gen_fname)
+    print(f'# output going to file {gen_fname}')
     print_metadata(gen_fname, gen_fname)
     random.seed(random_seed)
     np.random.seed(random_seed)
@@ -75,49 +74,6 @@ def main():
         new_pop = advance_one_generation(gen, population)
         population = new_pop
     return
-    global df
-    df = pd.DataFrame(data_template, index=range(num_generations))
-    df.to_csv(f'data_{random_name}.txt', header=['gen', 'max_fit', 'max_dude', 'float_max_dude', 'elite_avg_fit', 'avg_fit', 'entropy', 'occupancy'], index=None, sep='\t', mode='a')
-    print(f'data_{random_name}.txt')
-
-    # main_graph(df)
-    # make_histogram(df, num_generations)
-    # fit_vs_dude(df)
-    # df[["gen", 
-    #     "max_fit", 
-    #     #"elite_avg_fit",
-    #     "avg_fit", 
-    #     #"entropy"
-    #     ]].plot(x="gen")    
-    plt.show()
-
-    
-    
- #   df = df.drop(columns=["gen"])
- #   df.plot()
- #   plt.show()
-
-def main_graph(df):
-    plt.style.use('seaborn')
-    fig, ax1 = plt.subplots()
-
-    ax1.set_xlabel("gen")
-    ax1.set_ylabel('Fitness')
-    ax1.plot(df[["avg_fit"]], "b-")
-    ax1.tick_params(axis='y', labelcolor="blue")
-
-    ax2= ax1.twinx()
-
-    ax2.set_ylabel('Entropy')
-    ax2.plot(df[["entropy"]], "r-")
-    ax2.tick_params(axis='y', labelcolor="red")
-
-    ax3 = ax1.twinx()
-
-    ax3.set_ylabel('Max Individual')
-    ax3.plot(df[["max_dude"]], "g-")
-    ax3.tick_params(axis='y', labelcolor="green")
-    ax3.spines['right'].set_position(('outward', 40))
 
 
 def make_histogram(df, num_generations):
@@ -144,17 +100,8 @@ def advance_one_generation(gen, pop):
     elite_avg_fit = np.mean(elite_pop)
     # entropy, occupancy = calc_entropy(gen, pop)
     entropy, occupancy = calc_entropy_drift(gen, pop)
-    # global data_template
-    # data_template.append({"gen" : gen,
-    #                       "max_fit" : max_fit,
-    #                       "max_dude" : max_dude,
-    #                       "float_max_dude" : float_to_bin(max_dude),
-    #                       "elite_avg_fit" : elite_avg_fit,
-    #                       "avg_fit" : avg_fit,
-    #                       "entropy" : entropy,
-    #                       "occupancy" : sorted(occupancy, reverse=True)[:20]})
     print_pop_stats(gen, pop, fit_list)
-    if verbose:
+    if verbose >= 1:
         dump_pop(gen, pop, fit_list)
     # occupancy_dataframe.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
     # Selecting the best parents in the population for mating.
@@ -182,7 +129,7 @@ def make_pop_stats_line(gen, pop, fit_list):
 
 def print_pop_stats(gen, pop, fit_list):
     line_to_print = make_pop_stats_line(gen, pop, fit_list)
-    if verbose:
+    if verbose >= 1:
         print(line_to_print)
         sys.stdout.flush()
     with open(get_gen_info_fname(), 'a') as f:
@@ -191,12 +138,11 @@ def print_pop_stats(gen, pop, fit_list):
 
 
 def dump_pop(gen, pop, fit_list):
+    return
     print_pop_stats(gen, pop, fit_list)
     with open(get_gen_info_fname(), 'a') as f:
         f.write(line_to_print + '\n')
         f.flush()
-
-
 
 def get_gen_info_fname():
     return f'GA-gen-info_pid{os.getpid()}.out'
@@ -223,16 +169,21 @@ def calc_fitness(x):
     return fit_func(x)
 
 def fit_sin_on_gaussian(x):
+    """A fitness function that looks like a sin() riding on top of a
+    gaussian."""
     # fit = math.sin((x-400)/20) * (1 + 10*math.exp(-(x-400)**2/100000.0))
     xp = x - shift
-    fit = sin(2*math.pi*xp/oscillation_scale) * exp(-xp**2/20000) + 100*exp(-xp**2/1000000) + 2*sin(2*math.pi*xp/oscillation_scale)
+    fit = (sin(2*math.pi*xp/oscillation_scale) * exp(-xp**2/20000)
+           + 100*exp(-xp**2/1000000)
+           + 2*sin(2*math.pi*xp/oscillation_scale))
     if not math.isfinite(fit):
         return -sys.float_info.max
     return fit
 
 def fit_flattop_on_gaussian(x):
-    """A flat top fitness function should allow for constant fitness
-    drifting and more interesting plateaus."""
+    """A flat top fitness function that looks like a square wave riding on
+    top of a gaussian.  This should allow for drifting at constant
+    fitness and more interesting fitness plateaus."""
     # first adjust for the shift
     xp = x - shift
     # then adjust for keeping a flat region
@@ -364,7 +315,7 @@ def calc_entropy_drift(gen, pop):
     global first_pop_spread
     if first_pop_spread == -1:
         first_pop_spread = this_pop_spread
-    if verbose:
+    if verbose >= 2:
         print(f'#POP_SPREAD: {pmin}   {pmax}   {this_center}   {this_pop_spread}'
               + f'   {canonical_pop_spread}   {oscillation_scale}'
               + f'   {this_pop_spread / oscillation_scale}')
@@ -427,13 +378,15 @@ def mate_drift_lognormal(p1, p2):
     c1 = (p1 + p2) / 2.0
     c2 = (p1 + p2) / 2.0
     if random.random() < mutation_rate:
-        drift1 = np.random.lognormal(mean=1, sigma=10)
+        drift1 = np.random.lognormal(mean=lognormal_mean, sigma=lognormal_sigma)
         c1 += drift1
-        print(f'#drift1: {drift1} -> {c1}')
+        if verbose >= 2:
+            print(f'#drift1: {drift1} -> {c1}')
     if random.random() < mutation_rate:
-        drift2 = np.random.lognormal(mean=1, sigma=10)
+        drift2 = np.random.lognormal(mean=lognormal_mean, sigma=lognormal_sigma)
         c2 += drift2
-        print(f'#drift2: {drift2} -> {c2}')
+        if verbose >= 2:
+            print(f'#drift2: {drift2} -> {c2}')
     return c1, c2
 
 
@@ -525,6 +478,8 @@ def print_metadata(fname, gen_fname):
 ##FITNESS_FUNCTION: {fit_func.__name__}
 ##MUTATION_RATE: {mutation_rate}
 ##MUTATION_RATE_DRIFT: {mutation_rate_drift}
+##LORNORMAL_MEAN: {lognormal_mean}
+##LORNORMAL_SIGMA: {lognormal_sigma}
 ##OSCILLATION_SCALE: {oscillation_scale}
 ##N_POP: {n_pop}
 ##N_GENERATIONS: {num_generations}

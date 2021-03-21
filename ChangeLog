@@ -1,5 +1,7 @@
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
+	* README.md: added some information on how to do runs and plots.
+
 	* GA-poly-max.py: reintroduced some stashed changes that set
 	function names for various entropy calculations, mutations, and
 	initial distributions.
