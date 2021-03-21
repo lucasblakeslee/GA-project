@@ -1,5 +1,9 @@
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
+	* GA-poly-max.py (calc_entropy_drift): added an entropy function
+	that covers a single range of numbers, so that entropies are more
+	commensurate.
+
 	* GA-poly-max.py: separated out the entropy calculation into
 	selectable functions, so that now it is reported in the metadata.
 

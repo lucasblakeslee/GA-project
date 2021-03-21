@@ -25,7 +25,7 @@ verbose = 2
 shift = 87500.3
 
 # don't change these functions here; change them in main()
-global initial_func, mate_func, fit_func
+global initial_func, mate_func, fit_func, entropy_func
 initial_func = mate_func = fit_func = entropy_func = None
 
 ## parameters of the run
@@ -53,7 +53,7 @@ def main():
     initial_func = make_initial_rnd_0 # make_initial_all_85000, make_initial_random, ...
     mate_func = mate_drift # mate_bitflip, mate_drift, mate_drift_lognormal
     fit_func = fit_flattop_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
-    entropy_func = calc_entropy_drift_adapt # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+    entropy_func = calc_entropy_drift # calc_entropy_bits, calc_entropy_drift, ...
 
     print_fit_func_for_plot(f'fit-func_pid{os.getpid()}.out')
     # NOTE: you can force the seed to get reproducible runs.
@@ -295,6 +295,29 @@ def calc_entropy_bits(gen, pop):
         
     shannon_entropy = occupancy_list2entropy(occupancy)
     return shannon_entropy, occupancy
+
+def calc_entropy_drift(gen, pop):
+    """Entropy calculation that is appropriate for drift mutations.  The
+    main difference is that instead of assuming unique population
+    members, we instead put the population into bins -- i.e. we define
+    the species to be linearly spaced bins in the population's range
+    of values.  Then we use occupancy levels in those bins to
+    calculate entropy."""
+    n_bins = 10*n_pop
+    pop_spread = 200*1000
+    pmin, pmax = shift - pop_spread/2, shift + pop_spread/2
+    this_center = pmin + (pmax - pmin)/2.0
+    bin_width = pop_spread / n_bins
+    occupancy = [0]*n_bins
+    occupancy[0] = count_pop_in_bin(pop, -sys.float_info.max, pmin + bin_width)
+    occupancy[n_bins-1] = count_pop_in_bin(pop, pmax - bin_width, sys.float_info.max)
+    for i in range(1, n_bins-1):
+        x_left_edge = pmin + i * bin_width
+        x_right_edge = pmin + (i+1) * bin_width
+        occupancy[i] = count_pop_in_bin(pop, x_left_edge, x_right_edge)
+    entropy = occupancy_list2entropy(occupancy)
+    return entropy, occupancy
+
 
 def calc_entropy_drift_adapt(gen, pop):
     """Entropy calculation that is appropriate for drift mutations.  The
