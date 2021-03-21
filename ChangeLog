@@ -1,5 +1,8 @@
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
+	* plot_ga_output.py: started moving toward a gridspec layout so I
+	can add metadata information.
+
 	* README.md: added some information on how to do runs and plots.
 
 	* GA-poly-max.py: reintroduced some stashed changes that set
