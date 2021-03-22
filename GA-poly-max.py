@@ -38,10 +38,10 @@ assert(n_pop % 2 == 0)
 # the sin() peaks (i.e. the period!) this is then used to define
 # "mutation rate" and entropy bin sizes for drift mutation
 oscillation_scale = 80*math.pi
-mutation_rate = 0.10
-mutation_rate_drift = oscillation_scale / 3.0
+mutation_rate = 0.03
+mutation_rate_drift = oscillation_scale / 2.0
 lognormal_mean = 0.1
-lognormal_sigma = 2.0
+lognormal_sigma = 3.0
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 1400
@@ -51,7 +51,7 @@ def main():
     global initial_func, mate_func, fit_func, entropy_func
     # Change these functions here
     initial_func = make_initial_rnd_0 # make_initial_all_85000, make_initial_random, ...
-    mate_func = mate_drift # mate_bitflip, mate_drift, mate_drift_lognormal
+    mate_func = mate_drift_lognormal # mate_bitflip, mate_drift, mate_drift_lognormal
     fit_func = fit_flattop_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
     entropy_func = calc_entropy_drift # calc_entropy_bits, calc_entropy_drift, ...
 
@@ -93,7 +93,7 @@ def advance_one_generation(gen, pop):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy(gen, pop)
+    entropy, occupancy = calc_entropy(gen, elite_pop)
     print_pop_stats(gen, pop, fit_list)
     if verbose >= 1:
         dump_pop(gen, pop, fit_list)
@@ -113,7 +113,7 @@ def make_pop_stats_line(gen, pop, fit_list):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy(gen, pop)
+    entropy, occupancy = calc_entropy(gen, elite_pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
@@ -293,7 +293,7 @@ def calc_entropy_bits(gen, pop):
         else:
             n_pop_bad += 1
         
-    shannon_entropy = occupancy_list2entropy(occupancy)
+    shannon_entropy = occupancy_list2entropy(occupancy, pop)
     return shannon_entropy, occupancy
 
 def calc_entropy_drift(gen, pop):
@@ -303,7 +303,7 @@ def calc_entropy_drift(gen, pop):
     the species to be linearly spaced bins in the population's range
     of values.  Then we use occupancy levels in those bins to
     calculate entropy."""
-    n_bins = 10*n_pop
+    n_bins = 2*len(pop)
     pop_spread = 200*1000
     pmin, pmax = shift - pop_spread/2, shift + pop_spread/2
     this_center = pmin + (pmax - pmin)/2.0
@@ -315,7 +315,7 @@ def calc_entropy_drift(gen, pop):
         x_left_edge = pmin + i * bin_width
         x_right_edge = pmin + (i+1) * bin_width
         occupancy[i] = count_pop_in_bin(pop, x_left_edge, x_right_edge)
-    entropy = occupancy_list2entropy(occupancy)
+    entropy = occupancy_list2entropy(occupancy, pop)
     return entropy, occupancy
 
 
@@ -326,7 +326,7 @@ def calc_entropy_drift_adapt(gen, pop):
     the species to be linearly spaced bins in the population's range
     of values.  Then we use occupancy levels in those bins to
     calculate entropy."""
-    n_bins = 2*n_pop
+    n_bins = 2*len(pop)
     pmin = np.min(pop)
     pmax = np.max(pop)
     this_pop_spread = pmax - pmin
@@ -346,11 +346,11 @@ def calc_entropy_drift_adapt(gen, pop):
         x_left_edge = canonical_pmin + i * bin_width
         x_right_edge = canonical_pmin + (i+1) * bin_width
         occupancy[i] = count_pop_in_bin(pop, x_left_edge, x_right_edge)
-    entropy = occupancy_list2entropy(occupancy)
+    entropy = occupancy_list2entropy(occupancy, pop)
     return entropy, occupancy
 
 
-def occupancy_list2entropy(occ_list):
+def occupancy_list2entropy(occ_list, pop):
     """Underlying formula for entropy: this is the Shannon formula that
     takes occupancy probability and divides by the log thereof."""
     shannon_entropy = 0
@@ -359,7 +359,7 @@ def occupancy_list2entropy(occ_list):
         # n_pop_finite.  i.e. do I use fraction of full population, or
         # fraction of finite population?
         if occ_list[i] != 0:
-            prob = occ_list[i] / n_pop
+            prob = occ_list[i] / len(pop)
             individual_surprise = -prob * math.log(prob)
             shannon_entropy += individual_surprise
     # # now handle the bad numbers, those that are not finite.  we
@@ -499,8 +499,8 @@ def print_metadata(fname, gen_fname):
 ##ENTROPY_FUNCTION: {entropy_func.__name__}
 ##MUTATION_RATE: {mutation_rate}
 ##MUTATION_RATE_DRIFT: {mutation_rate_drift}
-##LORNORMAL_MEAN: {lognormal_mean}
-##LORNORMAL_SIGMA: {lognormal_sigma}
+##LOGNORMAL_MEAN: {lognormal_mean}
+##LOGNORMAL_SIGMA: {lognormal_sigma}
 ##OSCILLATION_SCALE: {oscillation_scale}
 ##N_POP: {n_pop}
 ##N_GENERATIONS: {num_generations}

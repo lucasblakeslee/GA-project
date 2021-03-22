@@ -1,3 +1,8 @@
+2021-03-22  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py: set the entropy to be calculated based on the
+	elite half of the population.
+
 2021-03-21  Mark Galassi  <mark@galassi.org>
 
 	* GA-poly-max.py (calc_entropy_drift): added an entropy function

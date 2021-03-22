@@ -43,6 +43,8 @@ def prepare_plots(fname):
     fig = plt.figure()
     gs = gridspec.GridSpec(3, 2)
     axtxt = fig.add_subplot(gs[:, -1])
+    axtxt.xaxis.set_visible(False)
+    axtxt.yaxis.set_visible(False)
     axs = [fig.add_subplot(gs[i, 0]) for i in range(3)]
     suptitle = fig.suptitle(f'GA output file {fname}', fontsize='x-large')
     suptitle.set_y(0.98)
