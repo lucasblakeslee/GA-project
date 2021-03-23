@@ -42,12 +42,6 @@
  \end{frame}
 }
 
-\AtBeginSubsection[]{
- \begin{frame}{Outline}
-   \tableofcontents[currentsubsection]
- \end{frame}
-}
-
 \usepackage{upquote,textcomp}   % get correct ascii quotes in verbatim
 \usepackage{cclicenses}
 
@@ -111,6 +105,9 @@
 \usepackage{url}
 \usepackage{media9}
 
+\usepackage{smartdiagram}
+
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,decorations.pathreplacing,decorations.pathmorphing,shapes,matrix,shapes.symbols}
 
 \title{Entropy in Evolutionary Algorithms}
 \subtitle{Statistical mechanics bearing insight into evolution}
@@ -137,64 +134,52 @@
   \maketitle
 \end{frame}
 
-\begin{frame}{Outline} 
-  \tableofcontents
+\section{Abstract}
+
+\begin{frame}{Abstract}
+	Genetic algorithms (GAs) are an optimization technique inspired by
+	natural selection. GAs have yielded good results in certain practical
+	problems, yet there is still more to be understood about their
+	behavior on a theoretical level. One approach is to look at the
+	evolutionary process from the point of view of statistical mechanics,
+	and interpreting jumps in fitness as phase transitions. Toward this
+	goal we examine the behavior of \emph{entropy} in a GA that optimizes
+	a simple function.  We find that entropy increases as a new species
+	diversifies, but its upper bound decreases with most phase
+	transitions (which correspond to evolutionary steps).
 \end{frame}
 
+\section{Background}
 
-\section{Goals}
+\begin{frame}{Genetic Algorithms}
+	\begin{center}
+		\smartdiagram[flow diagram:horizontal]{Population, Fitness Evaluation, Selection, Crossover, Mutation}
+	\end{center}
+\end{frame}
 
-\begin{frame}{Goals and path}
-  In the educational industrial complex we are required to state our
-  goals before we start.\\
-  It might even be a good idea.
+\begin{frame}{Punctuated Equilibrium}
+      	\centering
+      	      \includegraphics[width=0.75\textwidth]{Punctuated_Equilibrium.pdf}\\
+      	      \tiny Ian Alexander, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+\end{frame}
 
-  \begin{columns}[t]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Goals}
-        \begin{itemize}
-          \pause\item
-          Have a broad view of University curriculum, successes and
-          limitations, state of industry.\\
-          \pause\item
-          Awareness of grand challenges \\in software engineering.\\
-          \pause\item
-          Awareness of current approaches \\ to address those challenges.\\
-        \end{itemize}
-      \end{block}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \pause
-      \begin{block}{The meandering path}
-        \begin{itemize}
-          \pause\item
-          My path is largely historical because of \\ my personal inclination
-          to use history \\ to give perspective.\\
-          \pause\item
-          We need perspective so we are not tossed about by the short-term
-          interest of industry.
-        \end{itemize}
-      \end{block}
-    \end{column}
-  \end{columns}
-  \pause
-  \begin{block}{Style}
-    \begin{itemize}
-    \item
-      Slides are placeholders for me to then tell stories.  \\ \pause
-      I hope you will talk and tell stories too. \\ \pause
-    \item
-      But also: I join the modern quest to give a seminar made
-      entirely of xkcd slides.
-    \end{itemize}
-  \end{block}
+\begin{frame}{Shannon Entropy}
+		$
+		Entropy \ H(X) = -\sum p(X)\log p(X)
+		$
+		\\
+		"Amount of information" contained within a variable.
 \end{frame}
 
 \part{Part I, day 1}
 
-\section{Setting the stage}
+\section{Experimentation}
 
-\begin{frame}{A picture}
+\begin{frame}{Our GA}
+	IEEE 754
+\end{frame}
+
+\begin{frame}{Pretty graphs}
   \begin{columns} % This creates a frame with multiple columns.
     % The first column will be 50% as wide as the width of text on the page.
     \begin{column}{0.4\textwidth}
@@ -202,27 +187,12 @@
       % converted from .eps using Adobe Acrobat. The file graph1.png
       % should be in the same folder as the .tex file.
       \includegraphics[width=\textwidth]{GA-gen-info_pid3095791.out.pdf}
-                      {\tiny Margaret Hamilton, who led the MIT
-                        team that wrote the Apollo on-board
-                        software in the 1960s, is one of the
-                        coiners of the term ``software
-                        engineering''.\par}
+                      {\tiny Woo hoo, graphs!\par}
     \end{column}
-    
-    \pause
 
     \begin{column}{0.6\textwidth}
-      \includegraphics[width=0.75\textwidth]{GA-gen-info_pid3095791.out.pdf}
-      \\
-      \pause
-      Most of the computer science department courses.\\
-      \pause
-      Less math.\\
-      \pause
-      Process and management classes.\\
-      \pause
-      ISO's ``Software Engineering Body of Knowledge'' (SWEBOK).
-      
+      \includegraphics[width=0.75\textwidth]{GA-gen-info_pid3095791.out.pdf}\\
+      				{\tiny The same one but in a different column!}
     \end{column}
   \end{columns}
 \end{frame}
