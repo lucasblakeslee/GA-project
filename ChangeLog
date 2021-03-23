@@ -1,5 +1,8 @@
 2021-03-22  Mark Galassi  <mark@galassi.org>
 
+	* plot_ga_output.py: added a center panel which shows the log
+	scale of the left panel plots.
+
 	* GA-poly-max.py: set the entropy to be calculated based on the
 	elite half of the population.
 
