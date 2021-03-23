@@ -1,3 +1,36 @@
+2021-03-22  Mark Galassi  <mark@galassi.org>
+
+	* plot_ga_output.py: added a center panel which shows the log
+	scale of the left panel plots.
+
+	* GA-poly-max.py: set the entropy to be calculated based on the
+	elite half of the population.
+
+2021-03-21  Mark Galassi  <mark@galassi.org>
+
+	* GA-poly-max.py (calc_entropy_drift): added an entropy function
+	that covers a single range of numbers, so that entropies are more
+	commensurate.
+
+	* GA-poly-max.py: separated out the entropy calculation into
+	selectable functions, so that now it is reported in the metadata.
+
+	* plot_ga_output.py: adjusted sizes so that we now get a
+	reasonable fit.
+
+	* plot_ga_output.py (load_LEM, present_metadata): metadata is now
+	in there, but the overall window size does not currently hold it
+	in.
+
+	* plot_ga_output.py: started moving toward a gridspec layout so I
+	can add metadata information.
+
+	* README.md: added some information on how to do runs and plots.
+
+	* GA-poly-max.py: reintroduced some stashed changes that set
+	function names for various entropy calculations, mutations, and
+	initial distributions.
+
 2021-03-20  Mark Galassi  <mark@galassi.org>
 
 	* GA-entropy-slides.tex, README.md: a simple start to a beamer
