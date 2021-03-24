@@ -15,6 +15,7 @@
 \usepackage{capt-of}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{setspace}
 
 \date{\today}
 \title{Entropy in Evolutionary Algorithms}
@@ -206,6 +207,19 @@ as it was at previous levels.
 
 \section{Discussion}
 \label{sec:org7999995}
+Entropy rapidly falls as the average fitness makes a step forwards. This is because as the x-position value nears the local maxima the preceding values fall out of the population as the fittest individuals progress to the next generation. This is similar to punctuated equilibrium, the hypothesis that evolutionary development is marked by isolated episodes of rapid speciation between long periods of little or no change, in that it is gradual evolution followed by sharp rapid steps forward in the fitness function. 
+\begin{figure}[h]
+	\begin{center}
+	\includegraphics[scale=0.25]{Punctuated_Equilibrium.pdf}
+	\caption{
+		\small Ian Alexander, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+	}
+\end{center}
+\end{figure}
+
+
+
+
 \subsection{what does this mean?}
 \label{sec:orgf7b36ed}
 content...
@@ -223,13 +237,21 @@ algorithm doesn't get stuck on a local maxima rather than the global one.
 \label{sec:org0f04af1}
 Going forwards, it could be interesting to optimize a genetic algorithm from the standpoint of its entropy.
 
+\section{Conclusion}
+
+
+
 \section{References}
 \label{sec:org9dc046e}
 \textbf{these will ultimately need to be alphebatized by last name of the first author} \textbf{the citation style should be consistent, I was thinking APA}
-
+\doublespacing
 Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), \emph{Advances in Genetic Programming} (pp. 3-17). Cambridge: MIT Press.
 
 Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search algorithms: Evolutionary computing in perspective.
 In: van Leeuwen J. (eds) Computer Science Today. Lecture Notes in Computer Science, vol 1000. Springer, Berlin, Heidelberg.
 \url{https://doi.org/10.1007/BFb0015249}
+
+Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved from 
+$https://www.lexico.com/definition/punctuated_equilibrium$
+(Punctuated Equilibrium, 2020)
 \end{document}
