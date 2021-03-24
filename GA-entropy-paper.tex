@@ -14,6 +14,7 @@
 \usepackage{amssymb}
 \usepackage{capt-of}
 \usepackage{hyperref}
+\usepackage{xcolor}
 
 \date{\today}
 \title{Entropy in Evolutionary Algorithms}
@@ -109,6 +110,18 @@ the hamming distance between the binary strings of two organisms, and the
 Shannon entropy of the population was calculated at the end of each generation.
 Additionally, the elite and average fitnesses of the population were tracked.
 
+\subsection{Mate Drift vs Bitflip}
+Originally we represented individuals with a 32 bit binary string, and occasionally 
+flipped a random bit as mutation. Depending on whether a bit in the sign, the mantissa, 
+or the exponent was flipped, the impact the mutation had could vary drastically,
+much like how in biological evolution many mutations are silent or have little impact,
+ however occasionally  they can lead to very rapid change. Using this technique,
+ we had a very clear understanding of what mutation actually is. However, we found 
+that this led to some unprecedented issues regarding the numerical limitations
+of a 32 bit string. For example, in the string $0 01111111 11111111111111111111111$,
+the probability of the first bits flipping to a 1and remaining advantageous is incredibly
+low, as the majority of the other bits would have to flip to a 0.
+
 \section{Results:}
 \label{sec:orged0917a}
 We found that rapid drops in entropy accompanied increases of fitness, and
@@ -121,7 +134,7 @@ as it was at previous levels.
   \resizebox{0.5\linewidth}{!}{%
     \includegraphics{GA-gen-info_pid3095791.out.pdf}
   }
-  \caption{One example of evolution FIXME add more.}
+  \caption{One example of evolution.}
   \label{fig:multi-step}
 \end{figure}
 
