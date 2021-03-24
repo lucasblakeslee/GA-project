@@ -1,3 +1,10 @@
+2021-03-24  Mark Galassi  <mark@galassi.org>
+
+	* GA-entropy-paper.tex (section{Approach}): started fleshing out
+	this seciton.
+	(section{Genetic algorithms in Brief}): added a brief intro
+	section.
+
 2021-03-22  Mark Galassi  <mark@galassi.org>
 
 	* plot_ga_output.py: added a center panel which shows the log

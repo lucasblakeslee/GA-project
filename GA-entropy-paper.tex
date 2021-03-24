@@ -90,8 +90,8 @@ upper bounds of the entropy would never reach levels they were previously at.
 
 \section{Genetic algorithms in Brief}
 
-In brief Genetic Algorithms attempt to find the maximum or minimum
-value of a function, such as those shown in
+In brief Genetic Algorithms attempt to find the maximum value of a
+function (called a \emph{fitness} function), such as those shown in
 Figure~\ref{fig:fit-func_pid3095791}
 
 They do so by having a population of candidate values that take steps
@@ -109,9 +109,29 @@ Some terminology is used in talking about GA evolution:
 \begin{description}
 \item[population] The collection of values currently being considered
   as possible solutions to the problem.
-\item[fitness] A function 
+\item[fitness] A function for which we are trying to find the maximum.
+\item[fitness landscape] A visualization of the fitness function which
+  shows the peaks in fitness, as well as the pitfalls in searching for
+  the peaks.
+\item[reproduction] FIXME
+\item[mutation] FIXME
 \end{description}
 
+
+
+\section{Approach}
+\label{sec:org8c588e5}
+
+To explore how the entropy of the GA population behaves we crafted an
+optimization problem that would bring out some well defined steps in
+fitness improvement, and also allow a period of statis between
+successive fitness peaks.
+
+The function we settled on is shown in
+Figure~\ref{fig:fit-func_pid3095791}: peaks are separated by valleys,
+and it can take the evolutionary process a while for a mutation to
+transport a population member across the valley and into the higher
+fitness area.
 
 \begin{figure}
   \label{fig:fit-func_pid3095791}
@@ -121,17 +141,13 @@ Some terminology is used in talking about GA evolution:
   \includegraphics{fit-func_pid3728854.pdf}
   }
   \caption{Two examples of fitness functions: one has a $\sin()$ wave
-    riding on a gaussian, the other has a flat-top wave riding on it.}
+    riding on a gaussian, the other has a flat-top wave riding on it.
+  Most of our results are based on the ``flat-top'' function.}
   \label{fig:multi-step}
 \end{figure}
 
-
-\section{Approach}
-\label{sec:org8c588e5}
-
-To explore how the entropy of the GA population behaves we crafted an
-optimization problem that would bring out some well defined
-steps in fitness improvement and also allow a period of statis between 
+At each step in the evolution we calculate the \emph{Shannon Entropy},
+a measure of FIXME, and we see how it behaves when there is a step in fitness.
 
 
 
@@ -139,6 +155,7 @@ steps in fitness improvement and also allow a period of statis between
 
 \section{Methods}
 \label{sec:org2c55902}
+
 Originally, we constructed a genetic algorithm to find the maxima of a
 polynomial using the IEEE 754 floating point standard to represent the
 chromosomes of an inidividual. The polynomial was structured as: ax\textsuperscript{7}
