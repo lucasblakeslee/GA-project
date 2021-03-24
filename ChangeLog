@@ -1,5 +1,8 @@
 2021-03-24  Mark Galassi  <mark@galassi.org>
 
+	* GA-entropy-paper.tex, GA-gen-info_pid3095791.out.pdf: some
+	improvements to the figure.
+
 	* GA-entropy-paper.tex (section{Approach}): started fleshing out
 	this seciton.
 	(section{Genetic algorithms in Brief}): added a brief intro

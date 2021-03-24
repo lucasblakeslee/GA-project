@@ -137,7 +137,6 @@ transport a population member across the valley and into the higher
 fitness area.
 
 \begin{figure}
-  \label{fig:fit-func_pid3095791}
   \centering
   \resizebox{\linewidth}{!}{%
   \includegraphics{fit-func_pid3815286.pdf}
@@ -146,7 +145,7 @@ fitness area.
   \caption{Two examples of fitness functions: one has a $\sin()$ wave
     riding on a gaussian, the other has a flat-top wave riding on it.
   Most of our results are based on the ``flat-top'' function.}
-  \label{fig:multi-step}
+  \label{fig:fit-func_pid3095791}
 \end{figure}
 
 At each step in the evolution we calculate the \emph{Shannon Entropy},
@@ -192,13 +191,16 @@ as it was at previous levels.
 
 
 \begin{figure}
-  \label{fig:gen-info_pid3095791}
   \centering
-  \resizebox{0.5\linewidth}{!}{%
+  \resizebox{\linewidth}{!}{%
     \includegraphics{GA-gen-info_pid3095791.out.pdf}
   }
-  \caption{One example of evolution.}
-  \label{fig:multi-step}
+  \caption{An example of evolution.  The top panel shows fitness as a
+    function of generation for a ``$\sin()$ on top of gaussian''
+    fitness landscape (see Figure~\ref{fig:fit-func_pid3095791}).  The
+    middle panel shows entropy, where you can see that the end point
+    of the evolution has a lower entropy than earlier phases.}
+  \label{fig:gen-info_pid3095791}
 \end{figure}
 
 \begin{figure}
