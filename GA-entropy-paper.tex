@@ -113,8 +113,11 @@ Some terminology is used in talking about GA evolution:
 \item[fitness landscape] A visualization of the fitness function which
   shows the peaks in fitness, as well as the pitfalls in searching for
   the peaks.
-\item[reproduction] FIXME
-\item[mutation] FIXME
+\item[reproduction] The breeding of two parent individuals into two children. Organisms are
+floats, and we can think of them as sequences of 32 bits in IEEE 754 format.
+\item[mutation] At the end of each generation the organisms undergo "mate drift" mutation, 
+wherein their offspring shift a small amount in one direction, with a low possibility 
+of large drifts occuring.
 \end{description}
 
 
@@ -147,8 +150,7 @@ fitness area.
 \end{figure}
 
 At each step in the evolution we calculate the \emph{Shannon Entropy},
-a measure of FIXME, and we see how it behaves when there is a step in fitness.
-
+a measure of the information content by applying Shannon's formula $H(X) = -\sum p(X)\log p(X)$ using occupancy of each state in the population, and we see how it behaves when there is a step in fitness.
 
 
 
