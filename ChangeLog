@@ -1,5 +1,8 @@
 2021-03-24  Mark Galassi  <mark@galassi.org>
 
+	* entropy_simple_example.py: new program to give a simple
+	description of entropy.
+
 	* GA-gen-info_pid3027915.out.pdf, GA-entropy-paper.tex: added
 	another exmaple of evolution.
 
