@@ -84,13 +84,15 @@ how they function.
 
 \section{Hypothesis}
 \label{sec:org26a3be1}
-We hypothesized that entropy would gradually rise as small non-significant
-mutations occured, and that occasionally one highly beneficial mutation in
-an organism would cause entropy to rapidly decrease as that mutation was
-selected for and spreads throughout the population, and that entropy would then
-begin to rise again in a cyclical pattern. We hypothesized that if we're considering
-entropy to be the number of possible states an organism can be in, the
-upper bounds of the entropy would never reach levels they were previously at.
+We hypothesized that entropy would gradually rise as small
+non-significant mutations occured, and that occasionally one highly
+beneficial mutation in an organism would cause entropy to rapidly
+decrease as that mutation was selected for and spreads throughout the
+population, and that entropy would then begin to rise again in a
+cyclical pattern. We hypothesized that if we're considering entropy to
+be the number of possible states an organism can be in, the upper
+bounds of the entropy would never reach levels they were previously
+at.
 
 
 \section{Genetic algorithms in Brief}
@@ -118,11 +120,12 @@ Some terminology is used in talking about GA evolution:
 \item[Fitness Landscape] A visualization of the fitness function which
   shows the peaks in fitness, as well as the pitfalls in searching for
   the peaks.
-\item[Reproduction] The breeding of two parent individuals into two children. Organisms are
-floats, and we can think of them as sequences of 32 bits in IEEE 754 format.
-\item[Mutation] At the end of each generation the organisms undergo "mate drift" mutation, 
-wherein their offspring shift a small amount in one direction, with a low possibility 
-of large drifts occuring.
+\item[Reproduction] The breeding of two parent individuals into two
+  children. Organisms are floats, and we can think of them as
+  sequences of 32 bits in IEEE 754 format.
+\item[Mutation] At the end of each generation the organisms undergo
+  "mate drift" mutation, wherein their offspring shift a small amount
+  in one direction, with a low possibility of large drifts occuring.
 \end{description}
 
 
@@ -157,8 +160,9 @@ fitness area.
 
 In addition to these two fitness functions, we have also used a
 polynomial fitness function, where the GA searched for the highest
-peak in a negative degree polynomial. However, we found that the 
-polynomial fitness function was not rich enough to yield interesting results.
+peak in a negative degree polynomial. However, we found that the
+polynomial fitness function was not rich enough to yield interesting
+results.
 
 
 
@@ -182,35 +186,44 @@ simple example here:
 
 Originally, we constructed a genetic algorithm to find the maxima of a
 polynomial using the IEEE 754 floating point standard to represent the
-chromosomes of an inidividual. The polynomial was structured as: ax\textsuperscript{7}
-+ ax\textsuperscript{6} \ldots + ax\textsuperscript{2} + ax + a. Later we
-decided to have the software find the maxima of other types of functions,
-in our case a $\sin$ wave riding on top of a gaussian. $ P(x) = \frac{1}{{\sigma \sqrt {2\pi } }} e^{{{ - \left( {x - \mu} \right)^2 } \mathord{\left/ {\vphantom {{ - \left( {x - \mu } \right)^2 } {2\sigma ^2 }}} \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}} $
+chromosomes of an inidividual. The polynomial was structured as:
+ax\textsuperscript{7} + ax\textsuperscript{6} \ldots +
+ax\textsuperscript{2} + ax + a. Later we decided to have the software
+find the maxima of other types of functions, in our case a $\sin$ wave
+riding on top of a gaussian. $ P(x) = \frac{1}{{\sigma \sqrt {2\pi }
+}} e^{{{ - \left( {x - \mu} \right)^2 } \mathord{\left/ {\vphantom {{
+            - \left( {x - \mu } \right)^2 } {2\sigma ^2 }}}
+      \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}} $
 
-The population of 10,000 underwent the standard evalutation, selection,
-crossover, and mutation of a  GA, with information about the population
-being collected at the end of each iteration. Diversity was measured using
-the hamming distance between the binary strings of two organisms, and the
-Shannon entropy of the population was calculated at the end of each generation.
-Additionally, the elite and average fitnesses of the population were tracked.
+The population of 10,000 underwent the standard evalutation,
+selection, crossover, and mutation of a GA, with information about the
+population being collected at the end of each iteration. Diversity was
+measured using the hamming distance between the binary strings of two
+organisms, and the Shannon entropy of the population was calculated at
+the end of each generation.  Additionally, the elite and average
+fitnesses of the population were tracked.
 
 \subsection{Mate Drift vs Bitflip}
-Originally we represented individuals with a 32 bit binary string, and occasionally 
-flipped a random bit as mutation. Depending on whether a bit in the sign, the mantissa, 
-or the exponent was flipped, the impact the mutation had could vary drastically,
-much like how in biological evolution many mutations are silent or have little impact,
- however occasionally  they can lead to very rapid change. Using this technique,
- we had a very clear understanding of what mutation actually is. However, we found 
-that this led to some unprecedented issues regarding the numerical limitations
-of a 32 bit string. For example, in the string $0 01111111 11111111111111111111111$,
-the probability of the first bits flipping to a 1and remaining advantageous is incredibly
+
+Originally we represented individuals with a 32 bit binary string, and
+occasionally flipped a random bit as mutation. Depending on whether a
+bit in the sign, the mantissa, or the exponent was flipped, the impact
+the mutation had could vary drastically, much like how in biological
+evolution many mutations are silent or have little impact, however
+occasionally they can lead to very rapid change. Using this technique,
+we had a very clear understanding of what mutation actually
+is. However, we found that this led to some unprecedented issues
+regarding the numerical limitations of a 32 bit string. For example,
+in the string $0 01111111 11111111111111111111111$, the probability of
+the first bits flipping to a 1and remaining advantageous is incredibly
 low, as the majority of the other bits would have to flip to a 0.
 
 \section{Results}
 \label{sec:orged0917a}
-We found that rapid drops in entropy accompanied increases of fitness, and
-additionally that the upper bound of the entropy never reached previous levels.
-Fitness changed in dramatic occasional jumps.
+
+We found that rapid drops in entropy accompanied increases of fitness,
+and additionally that the upper bound of the entropy never reached
+previous levels.  Fitness changed in dramatic occasional jumps.
 
 \begin{figure}[h]
   \centering
@@ -240,44 +253,69 @@ Fitness changed in dramatic occasional jumps.
 
 \section{Discussion \& Conclusions}
 \label{sec:org7999995}
-Entropy rapidly falls as the average fitness makes large steps. This is because as the x-position value nears the local maxima the preceding values fall out of the population as the fittest individuals progress to the next generation. We observed occasional dramatic jumps in fitness as opposed to a linear development. This is corresponds with punctuated equilibrium, a theory in evolutionary biology that evolutionary development is marked by isolated episodes of rapid speciation between long periods of little or no change (Punctuated Equilibrium, 2020).
+
+Entropy rapidly falls as the average fitness makes large steps. This
+is because as the x-position value nears the local maxima the
+preceding values fall out of the population as the fittest individuals
+progress to the next generation. We observed occasional dramatic jumps
+in fitness as opposed to a linear development. This is corresponds
+with punctuated equilibrium, a theory in evolutionary biology that
+evolutionary development is marked by isolated episodes of rapid
+speciation between long periods of little or no change (Punctuated
+Equilibrium, 2020).
+
 \begin{figure}[h]
 	\begin{center}
 	\includegraphics[scale=0.25]{Punctuated_Equilibrium.pdf}
-	\caption{
-		\small Ian Alexander, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
-	}
+	\caption{ \small Ian Alexander, CC BY-SA 4.0
+          <https://creativecommons.org/licenses/by-sa/4.0>, via
+          Wikimedia Commons }
 \end{center}
 \end{figure}
 
 \subsection{What does this mean?}
 \label{sec😮rgf7b36ed}
-In Figure 3 we see how when the average, elite, and max fitness take a step forward the entropy comes tumbling down. This means that as a species evolves and better adapts to its environments and beats out the competition entropy decreases. This does not violate the second law of thermodynamics because that only applies to an adiabatic system.
+
+In Figure 3 we see how when the average, elite, and max fitness take a
+step forward the entropy comes tumbling down. This means that as a
+species evolves and better adapts to its environments and beats out
+the competition entropy decreases. This does not violate the second
+law of thermodynamics because that only applies to an adiabatic
+system.
 
 \subsection{Limitations to genetic algorithms}
 \label{sec:org148bf83}
-There are some limitations to genetic algorithms. For example, one must
-have a very clear understanding of the problem, constraints, the data
-structure, etc. Additionally, genetic algorithms do not scale well with
-complexity -- problems with large numbers of elements often become exponentially
-more difficult to compute. There is also the difficulty of ensuring the
-algorithm doesn't get stuck on a local maxima rather than the global one.
+
+There are some limitations to genetic algorithms. For example, one
+must have a very clear understanding of the problem, constraints, the
+data structure, etc. Additionally, genetic algorithms do not scale
+well with complexity -- problems with large numbers of elements often
+become exponentially more difficult to compute. There is also the
+difficulty of ensuring the algorithm doesn't get stuck on a local
+maxima rather than the global one.
 
 \subsection{Future work}
 \label{sec:org0f04af1}
-Going forward, it could be interesting to optimize a genetic algorithm from the standpoint of its entropy.
+
+Going forward, it could be interesting to optimize a genetic algorithm
+from the standpoint of its entropy.
 
 \section{References}
 \label{sec:org9dc046e}
 \textbf{need to be alphebatized by last name of the first author}\\
 \doublespacing
-Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), \emph{Advances in Genetic Programming} (pp. 3-17). Cambridge: MIT Press.
 
-Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search algorithms: Evolutionary computing in perspective.
-In: van Leeuwen J. (eds) Computer Science Today. Lecture Notes in Computer Science, vol 1000. Springer, Berlin, Heidelberg.
+Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), \emph{Advances in
+Genetic Programming} (pp. 3-17). Cambridge: MIT Press.
+
+Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search
+algorithms: Evolutionary computing in perspective.  In: van Leeuwen
+J. (eds) Computer Science Today. Lecture Notes in Computer Science,
+vol 1000. Springer, Berlin, Heidelberg.
 $https://doi.org/10.1007/BFb0015249$
 
-Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved from 
-$https://www.lexico.com/definition/punctuated_equilibrium$
+Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved
+from $https://www.lexico.com/definition/punctuated_equilibrium$
 (Punctuated Equilibrium, 2020)
+
 \end{document}
