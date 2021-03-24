@@ -3,6 +3,7 @@
 import math
 import string
 import random
+import textwrap
 
 one_word_para = """dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude """
 two_word_para = """two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes """
@@ -24,11 +25,23 @@ def main():
     entropy_random = calc_word_entropy(random_para)
     for para in para_list:
         H = calc_word_entropy(para)
+        # now some tricks to get the variable names
         all_vars = globals().copy()
         all_vars.update(locals())
-        # print(global_vars.items())
-        # print(locals().items())
         my_var_name = [ k for k,v in all_vars.items() if v == para][0]
+        print(f'==================== {my_var_name} =======================')
+        print('\n'.join(textwrap.wrap(para, 72)))
+        print(f'=================== end of {my_var_name} ==================')
+        # print(f'{my_var_name} has entropy:   {H}')
+    for para in para_list:
+        H = calc_word_entropy(para)
+        # now some tricks to get the variable names
+        all_vars = globals().copy()
+        all_vars.update(locals())
+        my_var_name = [ k for k,v in all_vars.items() if v == para][0]
+        # print(f'==================== {my_var_name} =======================')
+        # print('\n'.join(textwrap.wrap(para, 72)))
+        # print('=================== end of {my_var_name} ==================')
         print(f'{my_var_name} has entropy:   {H}')
 
 def make_random_para(n_words, n_chars):
