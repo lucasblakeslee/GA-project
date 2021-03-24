@@ -24,10 +24,12 @@ def main():
     entropy_random = calc_word_entropy(random_para)
     for para in para_list:
         H = calc_word_entropy(para)
-        print(H, '   ', para.__str__())
-    print('one_word:', entropy_one_word, '   two_words:', entropy_two_words,
-          '   english:', entropy_english,
-          '   random:', entropy_random)
+        all_vars = globals().copy()
+        all_vars.update(locals())
+        # print(global_vars.items())
+        # print(locals().items())
+        my_var_name = [ k for k,v in all_vars.items() if v == para][0]
+        print(f'{my_var_name} has entropy:   {H}')
 
 def make_random_para(n_words, n_chars):
     para = ''
