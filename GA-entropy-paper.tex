@@ -29,6 +29,8 @@
  pdfcreator={Emacs 27.1 (Org mode 9.3)}, 
  pdflang={English}}
 
+\setlength\parindent{24pt}
+
 \begin{document}
 \maketitle
 %% \tableofcontents
@@ -66,16 +68,18 @@ may vary, there are some processes universal to GAs, which are:
 population → fitness evaluation → selection → crossover → mutation,
 repeat. Each organism in the population has its own 'chromosome,' or
 set of characteristics. Here is where the resemblance to biological
-evolution begins to weaken. The process continues to occur either
+evolution begins to weaken. GAs continue to occur either
 until some condition for termination has been met, or until a
-pre-specified number of iterations has elapsed. Genetic algorithms
+pre-specified number of iterations has elapsed. \\
+Genetic algorithms
 have been used in a variety of practical applications, from making
 "evolved antennae" for spacecrafts and satellites to the estimation of
 heat flux between sea ice and the atmosphere to predictive economic
-models. Entropy and evolution have been often explored together, with
+models. \\
+Entropy and evolution have been often explored together, with
 research on the subject going as far back as the 1870s, though
 Schrödinger's 1944 book \emph{What is life?} sparked a wave of modern
-interest. Here it was wondered how entropy would change over time in a
+interest. Here we wondered how entropy would change over time in a
 genetic algorithm, in order to attain a better theoretical grasp of
 how they function.
 
@@ -84,8 +88,9 @@ how they function.
 We hypothesized that entropy would gradually rise as small non-significant
 mutations occured, and that occasionally one highly beneficial mutation in
 an organism would cause entropy to rapidly decrease as that mutation was
-selected for, as it spreads throughout the population, and then entropy would
-begin to rise again, with the same cycle repeating. We hypothesized that the
+selected for and spreads throughout the population, and that entropy would then
+begin to rise again in a cyclical pattern. We hypothesized that if we're considering
+entropy to be the number of possible states an organism can be in, the
 upper bounds of the entropy would never reach levels they were previously at.
 
 
@@ -108,15 +113,15 @@ evolution.
 Some terminology is used in talking about GA evolution:
 
 \begin{description}
-\item[population] The collection of values currently being considered
+\item[Population] The collection of values currently being considered
   as possible solutions to the problem.
-\item[fitness] A function for which we are trying to find the maximum.
-\item[fitness landscape] A visualization of the fitness function which
+\item[Fitness] A function for which we are trying to find the maximum.
+\item[Fitness Landscape] A visualization of the fitness function which
   shows the peaks in fitness, as well as the pitfalls in searching for
   the peaks.
-\item[reproduction] The breeding of two parent individuals into two children. Organisms are
+\item[Reproduction] The breeding of two parent individuals into two children. Organisms are
 floats, and we can think of them as sequences of 32 bits in IEEE 754 format.
-\item[mutation] At the end of each generation the organisms undergo "mate drift" mutation, 
+\item[Mutation] At the end of each generation the organisms undergo "mate drift" mutation, 
 wherein their offspring shift a small amount in one direction, with a low possibility 
 of large drifts occuring.
 \end{description}
@@ -128,7 +133,7 @@ of large drifts occuring.
 
 To explore how the entropy of the GA population behaves we crafted an
 optimization problem that would bring out some well defined steps in
-fitness improvement, and also allow a period of statis between
+fitness improvement, and also allow a period of stasis between
 successive fitness peaks.
 
 \subsection{Fitness functions}
@@ -153,7 +158,8 @@ fitness area.
 
 In addition to these two fitness functions, we have also used a
 polynomial fitness function, where the GA searched for the highest
-peak in a negative degree polynomial.
+peak in a negative degree polynomial. However, we found that the 
+polynomial fitness function was not rich enough to yield interesting results.
 
 
 
@@ -203,11 +209,10 @@ low, as the majority of the other bits would have to flip to a 0.
 \section{Results}
 \label{sec:orged0917a}
 We found that rapid drops in entropy accompanied increases of fitness, and
-additionally that the upper bound of the entropy did not get as high
-as it was at previous levels.
+additionally that the upper bound of the entropy never reached previous levels.
+Fitness changed in dramatic occasional jumps.
 
-
-\begin{figure}
+\begin{figure}[h]
   \centering
   \resizebox{\linewidth}{!}{%
     \includegraphics{GA-gen-info_pid3095791.out.pdf}
@@ -220,7 +225,7 @@ as it was at previous levels.
   \label{fig:gen-info_pid3095791}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \resizebox{0.6\linewidth}{!}{%
     \includegraphics{GA-gen-info_pid3027915.out.pdf}
@@ -233,9 +238,9 @@ as it was at previous levels.
 
 
 
-\section{Discussion}
+\section{Discussion \& Conclusions}
 \label{sec:org7999995}
-Entropy rapidly falls as the average fitness makes a step forwards. This is because as the x-position value nears the local maxima the preceding values fall out of the population as the fittest individuals progress to the next generation. This is similar to punctuated equilibrium, the hypothesis that evolutionary development is marked by isolated episodes of rapid speciation between long periods of little or no change, in that it is gradual evolution followed by sharp rapid steps forward in the fitness function. 
+Entropy rapidly falls as the average fitness makes large steps. This is because as the x-position value nears the local maxima the preceding values fall out of the population as the fittest individuals progress to the next generation. We observed occasional dramatic jumps in fitness as opposed to a linear development. This is corresponds with punctuated equilibrium, a theory in evolutionary biology that evolutionary development is marked by isolated episodes of rapid speciation between long periods of little or no change (Punctuated Equilibrium, 2020).
 \begin{figure}[h]
 	\begin{center}
 	\includegraphics[scale=0.25]{Punctuated_Equilibrium.pdf}
@@ -245,12 +250,9 @@ Entropy rapidly falls as the average fitness makes a step forwards. This is beca
 \end{center}
 \end{figure}
 
-
-
-
-\subsection{what does this mean?}
-\label{sec:orgf7b36ed}
-content...
+\subsection{What does this mean?}
+\label{sec😮rgf7b36ed}
+In Figure 3 we see how when the average, elite, and max fitness take a step forward the entropy comes tumbling down. This means that as a species evolves and better adapts to its environments and beats out the competition entropy decreases. This does not violate the second law of thermodynamics because that only applies to an adiabatic system.
 
 \subsection{Limitations to genetic algorithms}
 \label{sec:org148bf83}
@@ -263,21 +265,17 @@ algorithm doesn't get stuck on a local maxima rather than the global one.
 
 \subsection{Future work}
 \label{sec:org0f04af1}
-Going forwards, it could be interesting to optimize a genetic algorithm from the standpoint of its entropy.
-
-\section{Conclusion}
-
-
+Going forward, it could be interesting to optimize a genetic algorithm from the standpoint of its entropy.
 
 \section{References}
 \label{sec:org9dc046e}
-\textbf{these will ultimately need to be alphebatized by last name of the first author} \textbf{the citation style should be consistent, I was thinking APA}
+\textbf{need to be alphebatized by last name of the first author}\\
 \doublespacing
 Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), \emph{Advances in Genetic Programming} (pp. 3-17). Cambridge: MIT Press.
 
 Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search algorithms: Evolutionary computing in perspective.
 In: van Leeuwen J. (eds) Computer Science Today. Lecture Notes in Computer Science, vol 1000. Springer, Berlin, Heidelberg.
-\url{https://doi.org/10.1007/BFb0015249}
+$https://doi.org/10.1007/BFb0015249$
 
 Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved from 
 $https://www.lexico.com/definition/punctuated_equilibrium$
