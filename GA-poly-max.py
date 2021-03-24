@@ -17,7 +17,9 @@ import os
 import shortuuid
 import numpy as np
 from scipy.stats import lognorm
+import json
 
+gen_dict = {}                 # dictionary of info for each generation
 verbose = 2
 
 # how much do we shift the exponentials in the sin */+ exp fitness
@@ -41,7 +43,7 @@ oscillation_scale = 80*math.pi
 mutation_rate = 0.03
 mutation_rate_drift = oscillation_scale / 2.0
 lognormal_mean = 0.1
-lognormal_sigma = 3.0
+lognormal_sigma = 2.9
 num_parents_mating = n_pop // 2
 assert(num_parents_mating % 2 == 0)
 num_generations = 1400
@@ -52,13 +54,15 @@ def main():
     # Change these functions here
     initial_func = make_initial_rnd_0 # make_initial_all_85000, make_initial_random, ...
     mate_func = mate_drift_lognormal # mate_bitflip, mate_drift, mate_drift_lognormal
-    fit_func = fit_flattop_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+    # fit_func = fit_flattop_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
+    fit_func = fit_sin_on_gaussian # fit_sin_on_gaussian, fit_flattop_on_gaussian, 
     entropy_func = calc_entropy_drift # calc_entropy_bits, calc_entropy_drift, ...
 
-    print_fit_func_for_plot(f'fit-func_pid{os.getpid()}.out')
+    print_fit_func_for_plot(f'fit-func_{get_info_fbase()}.out')
     # NOTE: you can force the seed to get reproducible runs.
     # comment the random.seed() call to get different runs each time.
-    gen_fname = get_gen_info_fname()
+    gen_fname = 'GA-gen-info_' + get_info_fbase() + '.out'
+    occupancy_fname = 'GA-gen-occupancy_' + get_info_fbase() + '.out'
     print(f'# output going to file {gen_fname}')
     print_metadata(gen_fname, gen_fname)
     random.seed(random_seed)
@@ -94,15 +98,16 @@ def advance_one_generation(gen, pop):
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
     entropy, occupancy = calc_entropy(gen, elite_pop)
-    print_pop_stats(gen, pop, fit_list)
-    if verbose >= 1:
-        dump_pop(gen, pop, fit_list)
+    print_pop_stats(gen, pop, fit_list, entropy, occupancy)
+    global gen_dict
+    gen_dict[gen] = [gen, pop.tolist(), occupancy, fit_list.tolist()]
+    dump_pop(gen, gen_dict)
     # occupancy_dataframe.append({"occupancy" : sorted(occupancy, reverse=True)[:20]})
     # Selecting the best parents in the population for mating.
     new_pop = select_pool(pop, fit_list, num_parents_mating)
     return new_pop
 
-def make_pop_stats_line(gen, pop, fit_list):
+def make_pop_stats_line(gen, pop, fit_list, entropy, occupancy):
     """Print useful bits of info about the current population list."""
     # print("fitness_list:", fit_list)
     # The best result in the current iteration.
@@ -113,7 +118,7 @@ def make_pop_stats_line(gen, pop, fit_list):
     elite_pop = sorted(fit_list, reverse=True)
     elite_pop = elite_pop[:len(elite_pop) // 2]
     elite_avg_fit = np.mean(elite_pop)
-    entropy, occupancy = calc_entropy(gen, elite_pop)
+    # entropy, occupancy = calc_entropy(gen, elite_pop)
     # print(fit_list)
     # print("best_result:", max_index, max_dude, max_fit)
     line_to_print = (f'max_dude_fit:   {gen}   {max_index}   {max_dude:20.26g}'
@@ -121,25 +126,25 @@ def make_pop_stats_line(gen, pop, fit_list):
                      + f'   {elite_avg_fit}   {avg_fit}    {entropy}    {sorted(occupancy, reverse=True)[:20]}')
     return line_to_print
 
-def print_pop_stats(gen, pop, fit_list):
-    line_to_print = make_pop_stats_line(gen, pop, fit_list)
+def print_pop_stats(gen, pop, fit_list, entropy, occupancy):
+    line_to_print = make_pop_stats_line(gen, pop, fit_list, entropy, occupancy)
     if verbose >= 1:
         print(line_to_print)
         sys.stdout.flush()
-    with open(get_gen_info_fname(), 'a') as f:
+    gen_fname = 'GA-gen-info_' + get_info_fbase() + '.out'
+    with open(gen_fname, 'a') as f:
         f.write(line_to_print + '\n')
         f.flush()
 
 
-def dump_pop(gen, pop, fit_list):
-    return
-    print_pop_stats(gen, pop, fit_list)
-    with open(get_gen_info_fname(), 'a') as f:
-        f.write(line_to_print + '\n')
-        f.flush()
+def dump_pop(gen, gen_dict):
+    # print_pop_stats(gen, pop, fit_list)
+    fname = 'gen-dump_' + get_info_fbase() + '.out'
+    with open(fname, 'w') as f:
+        json.dump(gen_dict, f)
 
-def get_gen_info_fname():
-    return f'GA-gen-info_pid{os.getpid()}.out'
+def get_info_fbase():
+    return f'pid{os.getpid()}'
 
 def calc_pop_fitness(pop):
     """Calculates the fitnesses of each member of a population and returns
@@ -393,19 +398,24 @@ def mate_drift(p1, p2):
     return c1, c2
 
 def mate_drift_lognormal(p1, p2):
-    direction = 1 if random.random() < 0.5 else -1
-    c1 = (p1 + p2) / 2.0
-    c2 = (p1 + p2) / 2.0
+    direction1 = 1 if random.random() < 0.5 else -1
+    direction2 = 1 if random.random() < 0.5 else -1
+    c1_base = (p1 + p2) / 2.0
+    c2_base = (p1 + p2) / 2.0
+    drift1 = 0
+    drift2 = 0
     if random.random() < mutation_rate:
         drift1 = np.random.lognormal(mean=lognormal_mean, sigma=lognormal_sigma)
-        c1 += drift1
-        if verbose >= 2:
-            print(f'#drift1: {drift1} -> {c1}')
+        drift1 *= direction1
+    c1 = c1_base + drift1
+    if verbose >= 2:
+        print(f'#drift1: {c1_base}   {drift1}   {c1}')
     if random.random() < mutation_rate:
         drift2 = np.random.lognormal(mean=lognormal_mean, sigma=lognormal_sigma)
-        c2 += drift2
-        if verbose >= 2:
-            print(f'#drift2: {drift2} -> {c2}')
+        drift2 *= direction2
+    c2 = c2_base + drift2
+    if verbose >= 2:
+        print(f'#drift2: {c2_base}   {drift2}   {c2}')
     return c1, c2
 
 
@@ -527,6 +537,7 @@ def print_fit_func_for_plot(fname):
     with open(fname, 'a') as f:
         while x <= shift + 5000:
             f.write(f'fit_plot:   {x}   {calc_fitness(x)}\n')
+            print(f'fit_plot:   {x}   {calc_fitness(x)}\n')
             x += 0.5
     print(f'# wrote function info to {fname}')
 

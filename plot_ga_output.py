@@ -21,6 +21,7 @@ def main():
         fig, axtxt, axs, axslog = prepare_plots(runfile)
         present_metadata(runfile, axtxt)
         plot_runfile(runfile, fig, axs, axslog)
+        show_generations(runfile)
     plt.show()
 
 def present_metadata(fname, ax):
@@ -99,6 +100,11 @@ def load_LEM(fname):
             key, val = line[2:].split(':', 1)
             assert(not key in LEM_dict)
             LEM_dict[key.strip()] = val.strip()
+
+
+def show_generations(runfile):
+    filebase = 
+    
 
 
 if __name__ == '__main__':
