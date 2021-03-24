@@ -79,21 +79,41 @@ how they function.
 
 \section{Hypothesis:}
 \label{sec:org26a3be1}
-It was hypothesized that entropy would gradually rise as small non-significant mutations arose, and the occurance of one highly beneficial mutation in an organism would cause entropy to rapidly decrease as that mutation was selected for, and then entropy would continue to rise, and the same cycle would repeat. It was hypothesized that the entropy would never again become as high as it was originally. One "iteration" of this hypothesized cycle would look like a backwards log normal distribution.
+We hypothesized that entropy would gradually rise as small non-significant
+mutations occured, and that occasionally one highly beneficial mutation in
+an organism would cause entropy to rapidly decrease as that mutation was
+selected for, as it spreads throughout the population, and then entropy would
+begin to rise again, with the same cycle repeating. We hypothesized that the
+upper bounds of the entropy would never reach levels they were previously at.
 
 \section{Approach:}
 \label{sec:org8c588e5}
-A plan was made, involving first construct a relatively simple genetic algorithm, and then analyzing the ways in which entropy changes over the course of finding a solution. The way that was decided to do this was to track diversity as a means of measuring the entropy.
+We planned to first create a genetic algorithm, then to code a variety of
+analysis functions that would calculate certain statistical quantities.
 
 \section{Methods:}
 \label{sec:org2c55902}
-First, a simple genetic algorithm was constructed to find the maxima of a polynomial, using the IEEE 754 floating point format to represent the chromosomes of the organisms, or that organism's coefficients of X. The polynomial was structured as: ax\textsuperscript{7} + ax\textsuperscript{6}  \ldots{} + ax\textsuperscript{2} + ax + a.
+Originally, we constructed a genetic algorithm to find the maxima of a
+polynomial using the IEEE 754 floating point standard to represent the
+chromosomes of an inidividual. The polynomial was structured as: ax\textsuperscript{7}
++ ax\textsuperscript{6} \ldots + ax\textsuperscript{2} + ax + a. Later we
+decided to have the software find the maxima of other types of functions,
+in our case a $\sin$ wave riding on top of a gaussian. $ P(x) = \frac{1}{{\sigma \sqrt {2\pi } }} e^{{{ - \left( {x - \mu} \right)^2 } \mathord{\left/ {\vphantom {{ - \left( {x - \mu } \right)^2 } {2\sigma ^2 }}} \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}} $
+\color{red} \textbf{!! We need to include a plot of this !!}
+\color{black}
 
-The population of 10,000 underwent the standard evalutation, selection, crossover, and mutation of a  GA, with information about the population being collected at the end of each iteration. Diversity was measured using the hamming distance between the binary strings of two organisms, and the Shannon entropy of the population was calculated at the end of each iteration. Additionally, the elite and average fitnesses of the population were tracked.
+The population of 10,000 underwent the standard evalutation, selection,
+crossover, and mutation of a  GA, with information about the population
+being collected at the end of each iteration. Diversity was measured using
+the hamming distance between the binary strings of two organisms, and the
+Shannon entropy of the population was calculated at the end of each generation.
+Additionally, the elite and average fitnesses of the population were tracked.
 
 \section{Results:}
 \label{sec:orged0917a}
-[I'm a little unclear on what our actual results were]
+We found that rapid drops in entropy accompanied increases of fitness, and
+additionally that the upper bound of the entropy did not get as high
+as it was at previous levels.
 
 
 \begin{figure}
@@ -112,11 +132,16 @@ The population of 10,000 underwent the standard evalutation, selection, crossove
 \label{sec:org7999995}
 \subsection{what does this mean?}
 \label{sec:orgf7b36ed}
-[once we have concrete results we can delve into this]
+content...
 
 \subsection{Limitations to genetic algorithms}
 \label{sec:org148bf83}
-There are some limitations to genetic algorithms. For example, one must have a very clear understanding of the problem, constraints, the data structure, etc. Additionally, genetic algorithms do not scale well with complexity -- problems with large numbers of elements often become exponentially more difficult to compute. There is also the difficulty of ensuring the algorithm doesn't get stuck on a local maxima rather than the global one.
+There are some limitations to genetic algorithms. For example, one must
+have a very clear understanding of the problem, constraints, the data
+structure, etc. Additionally, genetic algorithms do not scale well with
+complexity -- problems with large numbers of elements often become exponentially
+more difficult to compute. There is also the difficulty of ensuring the
+algorithm doesn't get stuck on a local maxima rather than the global one.
 
 \subsection{Future work}
 \label{sec:org0f04af1}
