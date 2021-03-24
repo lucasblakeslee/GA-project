@@ -37,11 +37,6 @@
 \setbeamercolor{block title example}{bg=green!20}
 
 % add outline at the start of each new section
-\AtBeginSection[]{
- \begin{frame}{Outline}
-   \tableofcontents[currentsection]
- \end{frame}
-}
 
 \usepackage{upquote,textcomp}   % get correct ascii quotes in verbatim
 \usepackage{cclicenses}
@@ -150,9 +145,32 @@
 	transitions (which correspond to evolutionary steps).
 \end{frame}
 
-\section{Background}
+\begin{frame}{Introduction}
+	\begin{itemize}
+		\item Genetic Algorithms (GAs) are stochastic search algorithms that take inspiration from evolutionary processes. 
+		\item Entropy is a generic term that means disorder. You can calculate it many different ways one method is shannonian information.
+		\item We were motivated to do in depth analysis of genetic algorithms in order to understand their behavior better on a theoretical level.
+		\item Schrödinger's book, "What is Life", sparked a modern wave of interest in the study of thermodynamics and evolution together.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Research Question}
+		What happpens to entropy as an organism evolves over time? 
+\end{frame}
+
+\begin{frame}{Hypothesis}
+	We hypothesized that entropy would gradually rise as small non-significant
+	mutations occured, and that occasionally one highly beneficial mutation in
+	an organism would cause entropy to rapidly decrease as that mutation was
+	selected for and spreads throughout the population, and that entropy would then
+	begin to rise again in a cyclical pattern. We hypothesized that if we're considering
+	entropy to be the number of possible states an organism can be in, the
+	upper bounds of the entropy would never reach levels they were previously at.
+\end{frame}
 
 \begin{frame}{Genetic Algorithms}
+	In brief Genetic Algorithms attempt to find the maximum value of a
+	function (called a fitness function).They do so by having a population of candidate values that take steps through the domain of that function.  The steps have a random	component, but the randomness is directed by a principle akin to	natural selection: when a population member has a high fitness value,	it is more likely to survive and breed new population members that share some of its characteristics.
 	\begin{center}
 		\smartdiagram[flow diagram:horizontal]{Population, Fitness Evaluation, Selection, Crossover, Mutation}
 	\end{center}
