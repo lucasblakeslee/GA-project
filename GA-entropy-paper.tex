@@ -382,7 +382,7 @@ $$
 %% \end{multicols}
 
 
-\section{Summary of Entropy for Word Sequences}
+\subsection{Summary of Entropy for Word Sequences}
 
 The table below summarizes the result of applying
 Equation~\ref{eq:shannon-entropy-def} to the sequences of text shown
@@ -405,7 +405,7 @@ The intuition we are trying to convey is that a more \emph{disordered}
 collection of words has a higher Shannon Entropy.
 
 
-\section{Methods}
+\section{The Experiments with Evolving Populations}
 
 Originally, we constructed a genetic algorithm to find the maxima of a
 polynomial using the IEEE 754 floating point standard to represent the
@@ -422,7 +422,7 @@ The population of 10,000 underwent the standard evalutation,
 selection, crossover, and mutation of a GA, with information about the
 population being collected at the end of each iteration. Diversity was
 measured using the hamming distance between the binary strings of two
-organisms, and the Shannon entropy of the population was calculated at
+organisms, and the Shannon Entropy of the population was calculated at
 the end of each generation.  Additionally, the elite and average
 fitnesses of the population were tracked.
 
