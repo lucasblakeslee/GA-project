@@ -1,5 +1,8 @@
 2021-03-24  Mark Galassi  <mark@galassi.org>
 
+	* GA-entropy-paper.tex: finished the portion on Shannon entropy
+	for word sequences.
+
 	* entropy_simple_example.py: cleaned up and improved output.
 
 	* entropy_simple_example.py: new program to give a simple

@@ -6,9 +6,10 @@ import random
 import textwrap
 
 one_word_para = """dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude dude """
+
 two_word_para = """two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes two dudes """
-english_para = """This is a simple paragraph of English text We hope that there will
-be many words that occur repeatedly.  The English language has many words and this paragraph might have many repetitions.  The hope is that there are enough repetitions.  So I ask: will the entropy be big or small?  The answer is that we will have to see what the program returns. """
+
+english_para = """This is a simple paragraph of English text. We hope that there will be many words that occur repeatedly.  The English language has many words and this paragraph might have many repetitions.  The hope is that there are enough repetitions.  So I ask: will the entropy be big or small?  The answer is that we will have to see what the program returns. """
 # make them long
 english_para *= 4
 one_word_para *= 4
@@ -49,7 +50,7 @@ def make_random_para(n_words, n_chars):
     done = False
     letters = string.ascii_lowercase
     while not done:
-        wordlen = random.randint(1, 5)
+        wordlen = random.randint(1, 7)
         word = ''.join(random.choice(letters) for i in range(wordlen))
         if len(para) == 0:
             para = word

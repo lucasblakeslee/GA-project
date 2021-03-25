@@ -1,6 +1,7 @@
 % Created 2021-03-14 Sun 16:03
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
+%% \documentclass[11pt,twocolumn]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -12,10 +13,22 @@
 \usepackage{amsmath}
 \usepackage{textcomp}
 \usepackage{amssymb}
-\usepackage{capt-of}
+%% \usepackage{capt-of}
 \usepackage{hyperref}
 \usepackage{xcolor}
+%% \usepackage{underscore}
 \usepackage{setspace}
+%% \usepackage{verbatimbox}
+%% \setlength{\columnsep}{1.9pc}
+%% \usepackage[obeyspaces]{url}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{multicol}
+%% \setlength\columnseprule{.4pt}
+
+
+%% \setlength{\columnseprule}{1pt}
+%% \def\columnseprulecolor{\color{blue}}
 
 \date{\today}
 \title{Entropy in Evolutionary Algorithms}
@@ -169,22 +182,227 @@ results.
 \subsection{Shannon Entropy}
 
 At each step in the evolution we calculate the \emph{Shannon Entropy},
-a measure of the information content by applying Shannon's formula
+a measure of the information content by applying Shannon's formula to
+the population $P$:
+\begin{equation}
+H({\rm P}) = -\sum_{x \in {\rm P}} p(x)\log p(x)
+\label{eq:shannon-entropy-def}
+\end{equation}
+where $p(x)$ is the probability that a member of the population be in
+\emph{state} $x$.  When our population consists of values on the real
+number line, our state will be a narrow band of numbers.  In other
+types of population (such as animal populations) the state could mean
+something else, like eye color, or number of fingers, or ability to
+walk upright.
 
-$$H(X) = -\sum p(X)\log p(X)$$
+Shannon Entropy is widely discussed elsewhere, but we can mention that
+the entropy relates to the \emph{disorder} or \emph{randomness} in the
+population.\footnote{Equating entropy to disorder is not the most
+rigorous definition, but it is good enough for our purposes here.}
 
-where $p(x)$ is the occupancy of each state in the population, and we
-see how it behaves when there is a step in fitness.
+We can also give a simple example here.  Let us look at words of text
+in a paragraph.  The ``population'' are the words (a sequence of
+characters separated by spaces).
 
-Shannon Entropy is widely discussed elsewhere, but we can give a
-simple example here.  Let us look at paragraphs of text, where the
-``population'' are the English words.  We will examine three
-different, and somewhat contrived, paragraphs: one which just repeats
-a single word, the other repeats a sequence of two words, the third
-has English text with some repetitions (in fact we repeat the phrase a
-few times), and the fourth is a bunch of random text.
+We will examine four different paragraphs that we have contrived: one
+which just repeats a single word, the other repeats a sequence of two
+words, the third has English text with some repetitions (in fact we
+repeat the whole phrase a few times), and the fourth is a bunch of
+random strings of letters broken up in to words.
+
+%% \begin{multicols}{2}
 
 
+\subsubsection{single word}
+
+\begin{tiny}
+\begin{verbatim}
+==================== one_word_para =======================
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude dude dude dude dude dude dude dude dude dude dude
+dude dude dude dude
+=================== end of one_word_para ==================
+\end{verbatim}
+\end{tiny}
+
+In this example the only word that ever comes up is the word
+\texttt{``dude''}, and its probability is $p({\rm dude}) = 1$.  Using
+this in Shannon's formula, together with the fact that
+$$lim_{x\rightarrow 1}x \log(x) = 0$$
+we get $H = 0$.
+
+So if all members of the population are identical, then the Shannon
+entropy is zero.
+
+\subsubsection{two word sequence}
+
+
+%% \end{multicols}
+
+\begin{tiny}
+\begin{verbatim}
+==================== two_word_para =======================
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+two dudes two dudes two dudes two dudes two dudes two dudes two dudes
+=================== end of two_word_para ==================
+\end{verbatim}
+\end{tiny}
+
+In this example there are only two words: \texttt{``dudes''} and
+\texttt{``two''}.  Each occurs 140 times, for a total of 280 words.
+
+There are only two probabilities to calculate: $p({\rm two}) = 1/2$
+and $p({\rm dudes}) = 1/2$.
+
+So the Shannon formlula (Equation~\ref{eq:shannon-entropy-def}) gives
+us:
+$$
+H({\rm P}) = -\frac{1}{2}\log\frac{1}{2} - \frac{1}{2}\log\frac{1}{2}
+= 0.693
+$$
+
+So with exactly two possible states, and the population divided
+equally between them, the entropy is $0.693$.
+
+
+\subsubsection{English paragraph}
+
+\begin{tiny}
+\begin{verbatim}
+==================== english_para =======================
+This is a simple paragraph of English text We hope that there will be
+many words that occur repeatedly.  The English language has many words
+and this paragraph might have many repetitions.  The hope is that there
+are enough repetitions.  So I ask: will the entropy be big or small?
+The answer is that we will have to see what the program returns. This is
+a simple paragraph of English text We hope that there will be many words
+that occur repeatedly.  The English language has many words and this
+paragraph might have many repetitions.  The hope is that there are
+enough repetitions.  So I ask: will the entropy be big or small?  The
+answer is that we will have to see what the program returns. This is a
+simple paragraph of English text We hope that there will be many words
+that occur repeatedly.  The English language has many words and this
+paragraph might have many repetitions.  The hope is that there are
+enough repetitions.  So I ask: will the entropy be big or small?  The
+answer is that we will have to see what the program returns. This is a
+simple paragraph of English text We hope that there will be many words
+that occur repeatedly.  The English language has many words and this
+paragraph might have many repetitions.  The hope is that there are
+enough repetitions.  So I ask: will the entropy be big or small?  The
+answer is that we will have to see what the program returns.
+=================== end of english_para ==================
+\end{verbatim}
+\end{tiny}
+
+For this example we wrote a computer program which takes this
+paragraph and calculates the Shannon Entropy.  The result was
+$$
+H(P) = 3.550
+$$
+
+We expect this to be quite a bit greater than the entropy for the
+repeated two word sequence, since the full use of the English language
+allows for less monotonous word sequences.
+
+\subsubsection{random text}
+
+Our entropy calculation program generates random strings of text,
+broken up in to words of length 1 to 5:
+
+\begin{tiny}
+\begin{verbatim}
+==================== random_para =======================
+l htnf ib s uk vw tisb hqide xtts b a cdet dknne hxnj ahozs flyy f cb
+vyoj azoo nlhbl fyb eqoy g nuq xqjrs w nw c yjfr uf vpwot yety teeq ic
+akuoe hqxt ekb o bqt kegs ggrxf dp x x rlf m rqalg vuk nw k h u c ne uib
+bkpkw cjb v qp v vdgqy hotlz oqrd ptuv mvzmt el b zv batit kcppv ejm
+mioh nprs sueq vqj ev sdm tat okvpi nni knyo ee h tni r vos vy k erij
+hke zan dn coz jqq lmxe cc gec sre w mvg j sr orwbj uudf kh b oazle
+jrcns njusn bydf gpzr dgy n wllxr jqn pmjz wa x o un aij rn cwgcz dgug
+klwf dxeik glg taht s nx rm snkeg ji mj hwx ojib bmsm ihfbr yc mnjz mu
+nxhwq md n d p nlyr z dbbh l jxjvc qozs ou tsq n etl zf s p jkrj tqo b m
+nznm lgef n i xfwdp l z ul how yny cwakg jo slm asl ceo xpzf wjg r nzwa
+d h bvyny wjeh gti c doy b b frar u dyf wvzw rqmvs xqu dl ulv e g nhtsh
+x zaie x s eagz jity oide dxlat rbzpc op dl fol fbypj iz qy v ig ih zcu
+dttl zlocz pghss x qgq gaa rnc hcno jx najyv ig wnpqb k xvzk mre jm x rs
+owqw wbizn nvbsz q q pch tcmmn jiyqj wtau ic f ge jqajq xud giddg lfj p
+h heyx v uy bxgm auph ysr l ds cone xjp smn hqzd olgdy detw jnw w d yv z
+g g qnxcp vitw bdm vvbm rjfg qq k xwr xyeku kz gwiag oik ilte xaqbi rg
+hbwml s sd q d f gsu axltu w aqk syue bqz hoo ud vxspe wyslv m irfec
+fvmh duh vi a y sbhf p fncx h n sfgxz ie y nd pqj xebn cmgcp xyqgc ya
+ogfw pi bxe mg istlv h nmt qkz cy a kcatr xouc ve pkzk fpao x h geb le
+yabb nu hs fn n b vud jsubf hpyw owi czsg
+=================== end of random_para ==================
+\end{verbatim}
+\end{tiny}
+
+Our program also calculated the entropy of this paragraph of random
+strings, finding it to be:
+$$
+H(P) = 5.522
+$$
+
+
+%% \end{multicols}
+
+
+\section{Summary of Entropy for Word Sequences}
+
+The table below summarizes the result of applying
+Equation~\ref{eq:shannon-entropy-def} to the sequences of text shown
+above:
+
+\begin{center}
+\begin{tabular}{ |c|c| }
+  \hline
+  type of text  &   entropy \\
+\hline
+one\_word\_para &   0.000 \\
+two\_word\_para &   0.693 \\
+english\_para  &   3.550 \\
+random\_para   &   5.522 \\
+\hline
+\end{tabular}
+\end{center}
+
+The intuition we are trying to convey is that a more \emph{disordered}
+collection of words has a higher Shannon Entropy.
 
 
 \section{Methods}
