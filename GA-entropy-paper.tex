@@ -403,47 +403,61 @@ collection of words has a higher Shannon Entropy.
 The Shannon formula in Equation~\ref{eq:shannon-entropy-def} can be
 applied to study how \emph{diversified} a population is.
 
-If a population starts 
+If a population starts with all organisms identical, it will have zero
+entropy.  As generations pass and the children mutate, the population
+will diversify.  This diversification will allow the population to
+explore more sectors of the fitness landscape.
+
+Now visualize what happens when your algorithm discovers a useful new
+trait in one member of the population: its children will dominate the
+reproductive game, until the entire population consists of children of
+the individuals who had the favorable mutation.
+
+After a while the population will diversify again, but it will never
+again reach the same level of diversity as before, since some possible
+mutations will now have a negative effect, and thus will not survive.
+
+The fitness increase can be thought of as a \emph{phase transition},
+in some ways analogous to when water vapor condenses into liquid
+water.  The water molecules in the gaseous state had many degrees of
+freedom and could float around their space.  In the liquid state the
+molecules have many fewer states they can live in, and thus the system
+has lower entropy.  A further decrease in entropy happens in a phase
+transition from liquid water to ice, when the molecules lose all
+freedom to move long distances, and can only vibrate within their
+crystal structure.
+
 
 
 
 \section{The Experiments with Evolving Populations}
 
 \subsection{Goals of the GA}
-  We designed the problem and the genetic algorithm with two goals in
-  mind: one more immediate, the other one inspired by trying to gain a
-  deeper understanding.
-\begin{description}
-\item [Immediate]
-  \begin{itemize}
-    \item[]
-    \item
-    Devise a procedure to look for the maximum value of a
-    function for which it can be hard to find that analytically.\\
-    \item
-    Write the code somewhat generally so that it can be applied
-    to other problems.\\
-    \item
-    Write visualization software to explore the relationship
-    between the solution and the \emph{fitness landscape}.\\
-  \end{itemize}
-\item [What is bubbling beneath?]
-  \begin{itemize}
-    \item[]
-    \item
-    We have a population of thousands of members.  What
-    describes the state of that population?
-    \item
-    When is the population ``ripe'' for a jump in fitness?
-    \item 
-    Can one learn about when to \emph{finish} a search?
-  \end{itemize}
-\item [The holy grail]
-  GAs are an example of a \emph{stochastic search} technique,
-  because they use random numbers to search a large space.  The holy
-  grail of stochastic search is to know when you have a ``close
-  enough'' solution so that you can halt the search.
-\end{description}
+
+We designed the problem and the genetic algorithm with two goals in
+mind: one more immediate, the other one inspired by trying to gain a
+deeper understanding.
+
+The most immediate goal was to devise an algorithm that would find the
+maximum value of a function, value which might be hard to find with
+direct mathematical methods.
+
+Toward this goal we wrote the code somewhat generally so that it can
+be applied to other maximization problems.  We also wrote a
+visualization program which allows us to explore the relationship
+between the solution and the \emph{fitness landscape}.
+
+But we are also interested in what we might call \emph{what is
+bubbling beneath:} we have a population of thousands of members, and
+we might ask some questions.  What describes the state of that
+population?  When is the population ``ripe'' for a jump in fitness?
+Can one learn about when to \emph{finish} a search?
+
+There is also a \emph{holy grail} type of question: GAs are an example
+of a \emph{stochastic search} technique, because they use random
+numbers to search a large space.  The holy grail of stochastic search
+is to know when you have a ``close enough'' solution so that you can
+halt the search.
 
 
 \subsection{The GA components and procedure}
