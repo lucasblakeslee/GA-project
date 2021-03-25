@@ -155,7 +155,7 @@
 \end{frame}
 
 \begin{frame}{Research Question}
-		What happpens to entropy as an organism evolves over time? 
+		What happpens to entropy as a genetic algorithm evolves over time? 
 \end{frame}
 
 \begin{frame}{Hypothesis}
@@ -182,23 +182,43 @@
       	      \tiny Ian Alexander, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
 \end{frame}
 
-\begin{frame}{Shannon Entropy}
-		$
-		Entropy \ H(X) = -\sum p(X)\log p(X)
-		$
+\begin{frame}{Entropy}
+		Shannon entropy $H(X) = -\sum p(X)\log p(X)$
 		\\
-		"Amount of information" contained within a variable.
+		\medskip
+		\begin{itemize}
+			\item "Amount of information" contained within a variable.
+			\item In this case, the number of possible states an organism can be in
+			\item $p(x)$ is the occupancy of each state in the population
+		\end{itemize}
+		\bigskip
+		See \emph{entropy\_simple\_example.py} for a simple demo of how Shannon entropy is calculated
 \end{frame}
 
 \part{Part I, day 1}
 
 \section{Experimentation}
 
+
 \begin{frame}{Our GA}
-	IEEE 754
+	Our GA was designed to find the maxima of a function. We used the IEEE 754 floating point standard to represent the chromosomes of organisms. Mutation occured via what we term \emph{mate bitflip}, where the children of two parents mutate every generation, with an oscillation scale determining about how far that drift is likely to be.
 \end{frame}
 
-\begin{frame}{Pretty graphs}
+\begin{frame}{Our GA}
+	\begin{figure}
+		\centering
+		\resizebox{\linewidth}{!}{%
+		\includegraphics{fit-func_pid3815286.pdf}
+		\includegraphics{fit-func_pid3728854.pdf}
+		}
+		\caption{Two examples of fitness functions: one has a $\sin()$ wave
+		riding on a gaussian, the other has a flat-top wave riding on it.
+		Most of our results are based on the ``flat-top'' function.}
+		\label{fig:fit-func_pid3095791}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Results}
   \begin{columns} % This creates a frame with multiple columns.
     % The first column will be 50% as wide as the width of text on the page.
     \begin{column}{0.4\textwidth}
@@ -206,17 +226,47 @@
       % converted from .eps using Adobe Acrobat. The file graph1.png
       % should be in the same folder as the .tex file.
       \includegraphics[width=\textwidth]{GA-gen-info_pid3095791.out.pdf}
-                      {\tiny Woo hoo, graphs!\par}
+                      {\tiny An example of evolution.  The top panel shows fitness as a
+                      function of generation for a ``$\sin()$ on top of gaussian''
+                      fitness landscape.  The
+                      middle panel shows entropy, where you can see that the end point
+                      of the evolution has a lower entropy than earlier phases.}
     \end{column}
 
     \begin{column}{0.6\textwidth}
-      \includegraphics[width=0.75\textwidth]{GA-gen-info_pid3095791.out.pdf}\\
-      				{\tiny The same one but in a different column!}
+     \includegraphics[width=\textwidth]{GA-gen-info_pid3027915.out.pdf}\\
+      				{\tiny Another example of evolution that shows more clearly how
+      				the entropy reaches lower pleateaus with increased fitness.}
     \end{column}
   \end{columns}
 \end{frame}
 
+\begin{frame}{Discussion}
+	Entropy rapidly falls as the average fitness makes large steps. This
+	is because as the x-position value nears the local maxima the
+	preceding values fall out of the population as the fittest individuals
+	progress to the next generation. We observed occasional dramatic jumps
+	in fitness as opposed to a linear development. This is corresponds
+	with punctuated equilibrium, a theory in evolutionary biology that
+	evolutionary development is marked by isolated episodes of rapid
+	speciation between long periods of little or no change (Punctuated
+	Equilibrium, 2020).
+\end{frame}
 
+\begin{frame}{References}
+	Kinnear, K. E. (1994). In K. E. Kinnear (Ed.), \emph{Advances in
+	Genetic Programming} (pp. 3-17). Cambridge: MIT Press.\\
+	\medskip
+	Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved
+	from $https://www.lexico.com/definition/punctuated\_equilibrium$\\
+	\medskip
+	Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search
+	algorithms: Evolutionary computing in perspective.  In: van Leeuwen
+	J. (eds) Computer Science Today. Lecture Notes in Computer Science,
+	vol 1000. Springer, Berlin, Heidelberg.
+	$https://doi.org/10.1007/BFb0015249$\\
+	
+\end{frame}
 
 %% \input{curriculum}
 
