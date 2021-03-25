@@ -13,24 +13,14 @@
 \usepackage{amsmath}
 \usepackage{textcomp}
 \usepackage{amssymb}
-%% \usepackage{capt-of}
 \usepackage{hyperref}
 \usepackage{xcolor}
-%% \usepackage{underscore}
 \usepackage{setspace}
-%% \usepackage{verbatimbox}
-%% \setlength{\columnsep}{1.9pc}
-%% \usepackage[obeyspaces]{url}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
 \usepackage{multicol}
-%% \setlength\columnseprule{.4pt}
 
-
-%% \setlength{\columnseprule}{1pt}
-%% \def\columnseprulecolor{\color{blue}}
-
-\date{\today}
+\date{2021-03-24}
 \title{Entropy in Evolutionary Algorithms}
 \author{Lucas Blakeslee\footnote{\texttt{lqblakeslee@gmail.com}},
   Aengus McGuinness\footnote{\texttt{aengus82520@gmail.com}}}
@@ -46,12 +36,10 @@
 
 \begin{document}
 \maketitle
-%% \tableofcontents
-
 
 \label{sec:org26f53e0}
 \begin{abstract}
-\label{sec:orga17da23}
+
 Genetic algorithms (GAs) are an optimization technique inspired by
 natural selection. GAs have yielded good results in certain practical
 problems, yet there is still more to be understood about their
@@ -65,28 +53,26 @@ transitions (which correspond to evolutionary steps).
 \end{abstract}
 
 
-%% -\textbf{- mode: org -}-
-
-
 \section{Motivation}
-\label{sec:org16abecd}
+
 Genetic algorithms are stochastic search algorithms based on the
 process of natural evolution, solving for the 'fittest' solutions to a
-problem. GAs are much more efficient than random or
-exhaustive search algorithms (Kinnear, 1994), however, they do not
-scale well with complexity (Radcliffe \& Surry, 1995). While specifics
-may vary, there are some processes universal to GAs, which are:
-population → fitness evaluation → selection → crossover → mutation,
-repeat. Each organism in the population has its own 'chromosome,' or
-set of characteristics. Here is where the resemblance to biological
-evolution begins to weaken. GAs continue to occur either
-until some condition for termination has been met, or until a
-pre-specified number of iterations has elapsed. \\
-Genetic algorithms
-have been used in a variety of practical applications, from making
-"evolved antennae" for spacecrafts and satellites, to the estimation of
-heat flux between sea ice and the atmosphere, to predictive economic
-models. \\
+problem. GAs are much more efficient than random or exhaustive search
+algorithms (Kinnear, 1994), however, they do not scale well with
+complexity (Radcliffe \& Surry, 1995). While specifics may vary, there
+are some processes universal to GAs, which are: population → fitness
+evaluation → selection → crossover → mutation, repeat. Each organism
+in the population has its own 'chromosome,' or set of
+characteristics. Here is where the resemblance to biological evolution
+begins to weaken. GAs continue to occur either until some condition
+for termination has been met, or until a pre-specified number of
+iterations has elapsed.
+
+Genetic algorithms have been used in a variety of practical
+applications, from making ``evolved antennae'' for spacecrafts and
+satellites, to the estimation of heat flux between sea ice and the
+atmosphere, to predictive economic models.
+
 Entropy and evolution have been often explored together, with
 attention to the idea going as far back as the 1870s, though
 Schrödinger's 1944 book \emph{What is life?} sparked a wave of modern
@@ -95,7 +81,7 @@ genetic algorithm, in order to attain a better theoretical grasp of
 how they function.
 
 \section{Hypothesis}
-\label{sec:org26a3be1}
+
 We hypothesized that entropy would gradually rise as small
 non-significant mutations occured, and that occasionally one highly
 beneficial mutation in an organism would cause entropy to rapidly
@@ -208,8 +194,6 @@ words, the third has English text with some repetitions (in fact we
 repeat the whole phrase a few times), and the fourth is a bunch of
 random strings of letters broken up in to words.
 
-%% \begin{multicols}{2}
-
 
 \subsubsection{Single word}
 
@@ -250,10 +234,8 @@ we get $H = 0$.
 So if all members of the population are identical, then the Shannon
 entropy is zero.
 
+
 \subsubsection{two word sequence}
-
-
-%% \end{multicols}
 
 \begin{tiny}
 \begin{verbatim}
@@ -377,9 +359,6 @@ H(P) = 5.522
 $$
 
 
-%% \end{multicols}
-
-
 \subsection{Summary of Entropy for Word Sequences}
 
 The table below summarizes the result of applying
@@ -416,11 +395,13 @@ chromosomes of an inidividual. The polynomial was structured as:
 ax\textsuperscript{7} + ax\textsuperscript{6} \ldots +
 ax\textsuperscript{2} + ax + a. Later we decided to have the software
 find the maxima of other types of functions, in our case a $\sin$ wave
-riding on top of a gaussian, as seen in figure~\ref{fig:fit-func_pid3095791}. \\
+riding on top of a gaussian, as seen in figure~\ref{fig:fit-func_pid3095791}.
+
 %$ P(x) = \frac{1}{{\sigma \sqrt {2\pi }
 %}} e^{{{ - \left( {x - \mu} \right)^2 } \mathord{\left/ {\vphantom {{
 %            - \left( {x - \mu } \right)^2 } {2\sigma ^2 }}}
 %      \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}} $\\
+
 The population of 10,000 underwent the standard evalutation,
 selection, crossover, and mutation of a GA, with information about the
 population being collected at the end of each generation. The Shannon 
@@ -434,14 +415,14 @@ occasionally flipped a random bit as mutation. Depending on whether a
 bit in the sign, the mantissa, or the exponent was flipped, the impact
 the mutation had would vary drastically, much like how in biological
 evolution many mutations have little to no impact, however
-occasionally they can lead to very dramatic change. Using this technique,
-we had a very clear understanding of what mutation actually
-is. However, we found that this led to some issues
-regarding the numerical limitations of this method. For example,
-in the string $0 01111111 11111111111111111111111$, the probability of
-the first bits flipping to a 1 and the fitness remaining advantageous is incredibly
-low, as the majority of the other bits would have to flip to a 0 to compensate
-for that significant change.
+occasionally they can lead to very dramatic change. Using this
+technique, we had a very clear understanding of what mutation actually
+is. However, we found that this led to some issues regarding the
+numerical limitations of this method. For example, in the string
+\texttt{0 01111111 11111111111111111111111}, the probability of the
+first bits flipping to a 1 and the fitness remaining advantageous is
+incredibly low, as the majority of the other bits would have to flip
+to a 0 to compensate for that significant change.
 
 
 
@@ -553,9 +534,9 @@ Radcliffe N.J., Surry P.D. (1995) Fundamental limitations on search
 algorithms: Evolutionary computing in perspective.  In: van Leeuwen
 J. (eds) Computer Science Today. Lecture Notes in Computer Science,
 vol 1000. Springer, Berlin, Heidelberg.
-$https://doi.org/10.1007/BFb0015249$
+\url{https://doi.org/10.1007/BFb0015249}
 
 Punctuated Equilibrium. (2020). In Oxford Online Dictionary. Retrieved
-from $https://www.lexico.com/definition/punctuated_equilibrium$
+from \url{https://www.lexico.com/definition/punctuated_equilibrium}
 
 \end{document}
