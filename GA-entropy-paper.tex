@@ -462,78 +462,42 @@ halt the search.
 
 \subsection{The GA components and procedure}
 
-Components
+When describing a Genetic Algorithm we break it down into these
+components:
 
-  \begin{description}
-  \item [Population of our GA] A collection of floating
-    point numbers.  (Floating point numbers approximate numbers on the
-    real line).\\
-  \item [Chromosomes/DNA] The 32 bits which represent a
-    floating point number in the IEEE 754 standard.  Each individual
-    has/is a single chromosome.
-  \item [Genes] The individual bits in a floating point numbers
-  \end{description}
+\begin{description}
+\item [Population of our GA] A collection of floating
+  point numbers.  (Floating point numbers approximate numbers on the
+  real line).\\
+\item [Chromosomes/DNA] The 32 bits which represent a
+  floating point number in the IEEE 754 standard.  Each individual
+  has/is a single chromosome.
+\item [Genes] The individual bits in a floating point numbers
+\end{description}
 
+Once we represent the genes, cromosomes/individuals, and population,
+we can then carry out the algorithm procedure:
 
-The algorithm for evolution
+\begin{description}
+\item [select by fitness] Evaluate the fitness function.
+\item [mate parents] Mate the fittest half of the population to
+  produce children.
+\item [mutate children] Randomly change the DNA of children,
+  either by flipping random bits in the floating point number,
+  or by having them drift along the real line.
+\end{description}
 
-    \begin{description}
-      \item [select by fitness] Evaluate the fitness function.
-      \item [mate parents] Mate the fittest half of the population to
-        produce children.
-      \item [mutate children] Randomly change the DNA of children,
-        either by flipping random bits in the floating point number,
-        or by having them drift along the real line.
-    \end{description}
+Our GA code has many tunable parameters, which can be found in the
+preliminary portion of the code.  To give an idea, some of these
+parameters are:
 
-
-Tuning the GA
-
-          \begin{description}
-          \item [type of mutation] Bit flip or drift.
-          \item [scale of drift] Depending on how the fitness landscape
-            oscillates, different drift sizes might fit that scale better.
-
-        \item [population/generations]
-        \end{description}
-
-
-%% Originally, we constructed a genetic algorithm to find the maxima of a
-%% polynomial using the IEEE 754 standard, a format for 
-%% representing floating points using a 32 bit binary string, to represent the
-%% chromosomes of an inidividual. The polynomial was structured as:
-%% ax\textsuperscript{7} + ax\textsuperscript{6} \ldots +
-%% ax\textsuperscript{2} + ax + a. Later we decided to have the software
-%% find the maxima of other types of functions, in our case a $\sin$ wave
-%% riding on top of a gaussian, as seen in figure~\ref{fig:fit-func_pid3095791}.
-
-%% %$ P(x) = \frac{1}{{\sigma \sqrt {2\pi }
-%% %}} e^{{{ - \left( {x - \mu} \right)^2 } \mathord{\left/ {\vphantom {{
-%% %            - \left( {x - \mu } \right)^2 } {2\sigma ^2 }}}
-%% %      \right. \kern-\nulldelimiterspace} {2\sigma ^2 }}} $\\
-
-%% The population of 10,000 underwent the standard evalutation,
-%% selection, crossover, and mutation of a GA, with information about the
-%% population being collected at the end of each generation. The Shannon 
-%% Entropy of the population was calculated, and additionally the elite and average
-%% fitnesses of the population were tracked.
-
-%% \subsection{Mate Drift vs Bitflip}
-
-%% Originally we represented individuals with a 32 bit binary string, and
-%% occasionally flipped a random bit as mutation. Depending on whether a
-%% bit in the sign, the mantissa, or the exponent was flipped, the impact
-%% the mutation had would vary drastically, much like how in biological
-%% evolution many mutations have little to no impact, however
-%% occasionally they can lead to very dramatic change. Using this
-%% technique, we had a very clear understanding of what mutation actually
-%% is. However, we found that this led to some issues regarding the
-%% numerical limitations of this method. For example, in the string
-%% \texttt{0 01111111 11111111111111111111111}, the probability of the
-%% first bits flipping to a 1 and the fitness remaining advantageous is
-%% incredibly low, as the majority of the other bits would have to flip
-%% to a 0 to compensate for that significant change.
-
+\begin{description}
+\item [type of mutation] Bit flip or drift.
+\item [scale of drift] Depending on how the fitness landscape
+  oscillates, different drift sizes might fit that scale better.
+\item [population] How many members are there?
+\item [generations] For how many generations do we run?
+\end{description}
 
 
 \section{Results}
