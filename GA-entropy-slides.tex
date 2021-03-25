@@ -69,8 +69,7 @@
 %% special instructions to make sure we can paste from pdf
 \makeatletter
 \def\addToLiterate#1{\edef\lst@literate{\unexpanded\expandafter{\lst@literate}\unexpanded{#1}}}
-\lst@Key{add to literate}{}{\addToLiterate{#1}}
-\makeatother
+\lst@Key{add to literate}{}{\addToLiterate{#1}} \makeatother
 
 %% customization of listings
 \usepackage{color}
@@ -100,7 +99,7 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{media9}
-
+\usepackage{setspace}
 \usepackage{smartdiagram}
 
 \usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,decorations.pathreplacing,decorations.pathmorphing,shapes,matrix,shapes.symbols}
@@ -155,7 +154,8 @@
 \end{frame}
 
 \begin{frame}{Research Question}
-		What happpens to entropy as a genetic algorithm evolves over time? 
+		What happpens to entropy as a genetic algorithm
+                evolves over time?
 \end{frame}
 
 \begin{frame}{Hypothesis}
@@ -169,17 +169,26 @@
 \end{frame}
 
 \begin{frame}{Genetic Algorithms}
-	In brief Genetic Algorithms attempt to find the maximum value of a
-	function (called a fitness function).They do so by having a population of candidate values that take steps through the domain of that function.  The steps have a random	component, but the randomness is directed by a principle akin to	natural selection: when a population member has a high fitness value,	it is more likely to survive and breed new population members that share some of its characteristics.
+	In brief Genetic Algorithms attempt to find the maximum value
+        of a function (called a fitness function).They do so by having
+        a population of candidate values that take steps through the
+        domain of that function.  The steps have a random component,
+        but the randomness is directed by a principle akin to natural
+        selection: when a population member has a high fitness value,
+        it is more likely to survive and breed new population members
+        that share some of its characteristics.
 	\begin{center}
-		\smartdiagram[flow diagram:horizontal]{Population, Fitness Evaluation, Selection, Crossover, Mutation}
+		\smartdiagram[flow diagram:horizontal]{Population,
+                  Fitness Evaluation, Selection, Crossover, Mutation}
 	\end{center}
 \end{frame}
 
 \begin{frame}{Punctuated Equilibrium}
       	\centering
-      	      \includegraphics[width=0.75\textwidth]{Punctuated_Equilibrium.pdf}\\
-      	      \tiny Ian Alexander, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
+        \includegraphics[width=0.75\textwidth]{Punctuated_Equilibrium.pdf}\\ \tiny
+        Ian Alexander, CC BY-SA 4.0
+        <https://qcreativecommons.org/licenses/by-sa/4.0>, via
+        Wikimedia Commons
 \end{frame}
 
 \begin{frame}{Entropy}
@@ -187,12 +196,14 @@
 		\\
 		\medskip
 		\begin{itemize}
-			\item "Amount of information" contained within a variable.
+			\item "Amount of information" contained within
+                          a variable.
 			\item In this case, the number of possible states an organism can be in
 			\item $p(x)$ is the occupancy of each state in the population
 		\end{itemize}
 		\bigskip
-		See \emph{entropy\_simple\_example.py} for a simple demo of how Shannon entropy is calculated
+		See \emph{entropy\_simple\_example.py} for a simple
+                demo of how Shannon entropy is calculated
 \end{frame}
 
 \part{Part I, day 1}
@@ -201,7 +212,15 @@
 
 
 \begin{frame}{Our GA}
-	Our GA was designed to find the maxima of a function. We used the IEEE 754 floating point standard to represent the chromosomes of organisms. Mutation occured via what we term \emph{mate bitflip}, where the children of two parents mutate every generation, with an oscillation scale determining about how far that drift is likely to be.
+	\begin{itemize}
+		\item
+		Our GA was designed to find the maxima of a function. We used the IEEE 754 floating point standard to represent the chromosomes of organisms.
+		\item Mutation occured via what we term \emph{mate bitflip}, where the children of two parents mutate every generation.
+		\item We also include oscillation scale determining the period of the waves that ride the GA. This will change how easy it is to 'climb' a peak.
+		\item We also have a number of generations variable that allows you to put in place a time constraint.
+		
+		
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Our GA}
@@ -226,17 +245,26 @@
       % converted from .eps using Adobe Acrobat. The file graph1.png
       % should be in the same folder as the .tex file.
       \includegraphics[width=\textwidth]{GA-gen-info_pid3095791.out.pdf}
-                      {\tiny An example of evolution.  The top panel shows fitness as a
-                      function of generation for a ``$\sin()$ on top of gaussian''
-                      fitness landscape.  The
-                      middle panel shows entropy, where you can see that the end point
-                      of the evolution has a lower entropy than earlier phases.}
+                      {\tiny
+                      	\begin{singlespace}
+                      	 An example of evolution.  The top panel shows
+                         fitness as a function of generation for a
+                         ``$\sin()$ on top of gaussian'' fitness
+                         landscape.  The middle panel shows entropy,
+                         where you can see that the end point of the
+                         evolution has a lower entropy than earlier
+                         phases.
+              			\end{singlespace}    
+              }
     \end{column}
 
     \begin{column}{0.6\textwidth}
-     \includegraphics[width=\textwidth]{GA-gen-info_pid3027915.out.pdf}\\
-      				{\tiny Another example of evolution that shows more clearly how
-      				the entropy reaches lower pleateaus with increased fitness.}
+     \includegraphics[width=\textwidth]{GA-gen-info_pid3027915.out.pdf}\\ {\tiny
+      				\begin{singlespace}
+      				Another example of evolution that shows more clearly how
+      				the entropy reaches lower pleateaus with increased fitness.
+      				\end{singlespace}	
+      		}
     \end{column}
   \end{columns}
 \end{frame}
@@ -251,6 +279,28 @@
 	evolutionary development is marked by isolated episodes of rapid
 	speciation between long periods of little or no change (Punctuated
 	Equilibrium, 2020).
+\end{frame}
+
+\begin{frame}{Conclusion}
+	From this paper we have concluded that:
+	\begin{itemize}
+		\item Entropy does have a relationship to
+                  evolution. We can clearly see as the population
+                  evolves that entropy drops and recovers just short
+                  of where it previously been. There should be more
+                  research as too what offsets this entropy decrease.
+		
+		\item Genetic algorithms are much more complex than we
+                  thought. Many researchers have furthered the
+                  biological inspiration by adding the aspect of
+                  movement. In these genetic algorithms the population
+                  is dispersed across islands or distinct pods with
+                  limited interaction which helps to maintain
+                  diversity. They then introduce a migration variable
+                  where the organisms can move among the islands.
+		
+	\end{itemize}
+
 \end{frame}
 
 \begin{frame}{References}
