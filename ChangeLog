@@ -1,5 +1,7 @@
 2021-03-24  Mark Galassi  <mark@galassi.org>
 
+	* GA-entropy-slides.tex: reworked some of the GA slides.
+
 	* GA-entropy-paper.tex: finished the portion on Shannon entropy
 	for word sequences.
 

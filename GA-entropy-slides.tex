@@ -214,31 +214,113 @@ $$
 
 \section{Experimentation}
 
-
-\begin{frame}{Our GA}
-	\begin{itemize}
-		\item
-		Our GA was designed to find the maxima of a function. We used the IEEE 754 floating point standard to represent the chromosomes of organisms.
-		\item Mutation occured via what we term \emph{mate bitflip}, where the children of two parents mutate every generation.
-		\item We also include oscillation scale determining the period of the waves that ride the GA. This will change how easy it is to 'climb' a peak.
-		\item We also have a number of generations variable that allows you to put in place a time constraint.
-		
-		
-	\end{itemize}
+\begin{frame}{Our GA: goals}
+  We designed the problem and the genetic algorithm with two goals in
+  mind: one more immediate, the other one inspired by trying to gain a
+  deeper understanding.
+  \vspace{-0.2cm}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Immediate}
+        \begin{itemize}
+          \pause\item
+          Devise a procedure to look for the maximum value of a
+          function for which it can be hard to find that analytically.\\
+          \pause\item
+          Write the code somewhat generally so that it can be applied
+          to other problems.\\
+          \pause\item
+          Write visualization software to explore the relationship
+          between the solution and the \emph{fitness landscape}.\\
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \pause
+      \begin{block}{What is bubbling beneath?}
+        \begin{itemize}
+          \pause\item
+          We have a population of thousands of members.  What
+          describes the state of that population?
+          \pause\item
+          When is the population ``ripe'' for a jump in fitness?
+          \pause\item 
+          Can one learn about when to \emph{finish} a search?
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \pause
+  \begin{block}{The holy grail}
+    GAs are an example of a \emph{stochastic search} technique,
+    because they use random numbers to search a large space.  The holy
+    grail of stochastic search is to know when you have a ``close
+    enough'' solution so that you can halt the search.
+  \end{block}
 \end{frame}
 
-\begin{frame}{Our GA}
-	\begin{figure}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\includegraphics{fit-func_pid3815286.pdf}
-		\includegraphics{fit-func_pid3728854.pdf}
-		}
-		\caption{Two examples of fitness functions: one has a $\sin()$ wave
-		riding on a gaussian, the other has a flat-top wave riding on it.
-		Most of our results are based on the ``flat-top'' function.}
-		\label{fig:fit-func_pid3095791}
-	\end{figure}
+\begin{frame}{Our GA: procedure}
+  \begin{block}{Components}
+  \begin{description}
+  \item [Population of our GA] A collection of floating
+    point numbers.  (Floating point numbers approximate numbers on the
+    real line).\\
+  \item [Chromosomes/DNA] The 32 bits which represent a
+    floating point number in the IEEE 754 standard.  Each individual
+    has/is a single chromosome.
+  \item [Genes] The individual bits in a floating point numbers
+  \end{description}
+  \end{block}
+  \pause
+  \begin{block}{The evolution}
+    \begin{description}
+      \item [select by fitness] Evaluate the fitness function.
+      \item [mate parents] Mate the fittest half of the population to
+        produce children.
+      \item [mutate children] Randomly change the DNA of children,
+        either by flipping random bits in the floating point number,
+        or by having them drift along the real line.
+    \end{description}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Our GA: miscellenea}
+  \begin{block}{Tuning}
+    %% \begin{columns}[t]
+    %%   \begin{column}{0.5\textwidth}
+    %%     \begin{block}{Tuning}
+          \begin{description}
+          \item [type of mutation] Bit flip or drift.
+          \item [scale of drift] Depending on how the fitness landscape
+            oscillates, different drift sizes might fit that scale better.
+      %%     \end{description}
+      %%   \end{block}
+      %% \end{column}
+      %% \begin{column}{0.5\textwidth}
+      %%   \begin{description}
+        \item [population/generations]
+        \end{description}
+    %%   \end{column}
+    %% \end{columns}
+  \end{block}
+\end{frame}
+
+
+\begin{frame}{Fitness landscape}
+  A visualization of the fitness function which
+  shows the peaks in fitness, as well as the pitfalls in searching for
+  the peaks.
+  \begin{figure}
+    \centering
+    \resizebox{\linewidth}{!}{%
+      \includegraphics{fit-func_pid3815286.pdf}
+      \includegraphics{fit-func_pid3728854.pdf}
+    }
+    \caption{Two examples of fitness functions: one has a $\sin()$ wave
+      riding on a gaussian, the other has a flat-top wave riding on it.
+      Most of our results are based on the ``flat-top'' function.}
+    \label{fig:fit-func_pid3095791}
+  \end{figure}
 \end{frame}
 
 \begin{frame}{Results}
