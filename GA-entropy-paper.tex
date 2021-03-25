@@ -16,11 +16,12 @@
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{setspace}
+\usepackage{relsize}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
-\usepackage{multicol}
+\usepackage{geometry}
 
-\usepackage{listings}
+\usepackage{listings,multicol}
 \lstset{columns=flexible}
 \lstset{language=bash}
 \lstset{breaklines=true}
@@ -566,9 +567,10 @@ instructions on building the paper and running the code, can be found
 on our github page at
 \url{https://github.com/lucasblakeslee/GA-project}
 
-\lstinputlisting[language=python,
+\newgeometry{margin=1cm}
+\lstinputlisting[language=python, multicols=2,
   caption={\texttt{GA-func-max.py}}]{GA-func-max.py}
-
+\restoregeometry
 
 \pagebreak
 \section*{References}
