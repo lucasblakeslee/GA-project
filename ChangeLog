@@ -1,5 +1,8 @@
 2021-03-24  Mark Galassi  <mark@galassi.org>
 
+	* GA-entropy-paper.tex (section*{Appendix: the code for the
+	experiment}): added this appendix.
+
 	* GA-func-max.py: renamed from GA-poly-max.py to Ga-func-max.py,
 	since we now maximize arbitrary functions.
 

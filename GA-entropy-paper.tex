@@ -20,6 +20,21 @@
 \captionsetup{font=small,labelfont=bf}
 \usepackage{multicol}
 
+\usepackage{listings}
+\lstset{columns=flexible}
+\lstset{language=bash}
+\lstset{breaklines=true}
+\lstset{breakatwhitespace=true}
+\lstset{captionpos=b}
+\lstset{gobble=0}
+\lstset{language=Python}
+\lstset{basicstyle=\ttfamily\tiny}
+%% \lstset{literate={-}{-}1}
+%% \lstset{add to literate={~}{\ttil}{1}}
+\lstset{upquote=true}
+\lstset{tabsize=4}
+\lstset{prebreak=\small\symbol{'134}}
+
 \date{2021-03-24}
 \title{Entropy in Evolutionary Algorithms}
 \author{Lucas Blakeslee\footnote{\texttt{lqblakeslee@gmail.com}},
@@ -164,7 +179,7 @@ results.
 
 
 \subsection{Shannon Entropy}
-
+\label{subsec:shannon-entropy}
 At each step in the evolution we calculate the \emph{Shannon Entropy},
 a measure of the information content by applying Shannon's formula to
 the population $P$:
@@ -527,8 +542,36 @@ that entropy and fitness are closely related. Increases in fitness
 caused by evolution create a decrease in the entropy of the population 
 as those individuals are selected for.
 
+\appendix
+\section*{Appendix: the code for the experiment}
+
+The software consists of three programs:
+\begin{description}
+\item [\texttt{GA-func-max.py}] The genetic algorithm which evolves a
+  population to find the maximum of a function.  Approximately 611
+  lines of code.
+\item [\texttt{plot\_ga\_output.py}] Reads the output of
+  \texttt{GA-func-max.py} and makes panels of plots to visualize the
+  results, as shown in Figure~\ref{fig:gen-info_pid3095791}.
+  Approximately 130 lines of code.
+\item [\texttt{entropy\_simple\_example.py}] A program which
+  demonstrates how entropy works for a population of words in a chunk
+  of text, as discussed in Section~\ref{subsec:shannon-entropy}.
+  Approximately 100 lines of code.
+\end{description}
+
+We only show here the \texttt{GA-func-max.py} program.  This program,
+and the other two, and the \LaTeX\ source for this paper, and
+instructions on building the paper and running the code, can be found
+on our github page at
+\url{https://github.com/lucasblakeslee/GA-project}
+
+\lstinputlisting[language=python,
+  caption={\texttt{GA-func-max.py}}]{GA-func-max.py}
+
+
 \pagebreak
-\section{References}
+\section*{References}
 \label{sec:org9dc046e}
 \doublespacing
 
