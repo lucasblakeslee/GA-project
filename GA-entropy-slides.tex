@@ -146,6 +146,7 @@
 
 \begin{frame}{Introduction}
 	\begin{itemize}
+		\item \textbf{Research Question}: What happpens to entropy as a genetic algorithm evolves over time?
 		\item Genetic Algorithms (GAs) are stochastic search algorithms that take inspiration from evolutionary processes. 
 		\item Entropy is a generic term that means disorder. You can calculate it many different ways one method is shannonian information.
 		\item We were motivated to do in depth analysis of genetic algorithms in order to understand their behavior better on a theoretical level.
@@ -153,10 +154,6 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{Research Question}
-		What happpens to entropy as a genetic algorithm
-                evolves over time?
-\end{frame}
 
 \begin{frame}{Hypothesis}
 	We hypothesized that entropy would gradually rise as small non-significant
@@ -259,43 +256,6 @@ $$
   \end{block}
 \end{frame}
 
-\begin{frame}{Our GA: procedure}
-  \begin{block}{Components}
-  \begin{description}
-  \item [Population of our GA] A collection of floating
-    point numbers.  (Floating point numbers approximate numbers on the
-    real line).\\
-  \item [Chromosomes/DNA] The 32 bits which represent a
-    floating point number in the IEEE 754 standard.  Each individual
-    has/is a single chromosome.
-  \item [Genes] The individual bits in a floating point numbers
-  \end{description}
-  \end{block}
-  \pause
-  \begin{block}{The evolution}
-    \begin{description}
-      \item [select by fitness] Evaluate the fitness function.
-      \item [mate parents] Mate the fittest half of the population to
-        produce children.
-      \item [mutate children] Randomly change the DNA of children,
-        either by flipping random bits in the floating point number,
-        or by having them drift along the real line.
-    \end{description}
-  \end{block}
-\end{frame}
-
-\begin{frame}{Our GA: miscellenea}
-  \begin{block}{Tuning}
-          \begin{description}
-          \item [type of mutation] Bit flip or drift.
-          \item [scale of drift] Depending on how the fitness landscape
-            oscillates, different drift sizes might fit that scale better.
-        \item [population/generations] How many members are there, and
-          for how many generations do we run?
-        \end{description}
-  \end{block}
-\end{frame}
-
 
 \begin{frame}{Fitness landscape}
   A visualization of the fitness function which
@@ -346,7 +306,7 @@ $$
   \end{columns}
 \end{frame}
 
-\begin{frame}{Discussion}
+\begin{frame}{Discussion \& Conclusion}
 	Entropy rapidly falls as the average fitness makes large steps. This
 	is because as the x-position value nears the local maxima the
 	preceding values fall out of the population as the fittest individuals
@@ -356,20 +316,12 @@ $$
 	evolutionary development is marked by isolated episodes of rapid
 	speciation between long periods of little or no change (Punctuated
 	Equilibrium, 2020).
-\end{frame}
-
-\begin{frame}{Conclusion}
-	From this paper we have concluded that:
-	\begin{itemize}
-		\item The results supported our hypothesis in multiple ways:
-			\begin{itemize}
-				\item Entropy and evolution are related
-				\item Drops in entropy corresponded with increases in fitness
-				\item The upper bounds of entropy never reached above its previous levels
-			\end{itemize}
+	
+	
+	
+	\medskip
+	From this paper we have concluded that the results supported our hypothesis in multiple ways: entropy and evolution are related, drops in entropy corresponded with increases in fitness, and the upper bounds of entropy never reached above its previous levels
 		
-	\end{itemize}
-
 \end{frame}
 
 \begin{frame}{References}
