@@ -4,7 +4,7 @@
 % See the file LICENSE in this source distribution.
 
 %\documentclass[10pt,aspectratio=169]{beamer}
-\documentclass[handout,10pt,aspectratio=169]{beamer}
+\documentclass[handout,10pt]{beamer}
 
 \newcommand{\pitem}{\pause\item}
 
@@ -148,7 +148,7 @@
 	\begin{itemize}
 		\item \textbf{Research Question}: What happpens to entropy as a genetic algorithm evolves over time?
 		\item Genetic Algorithms (GAs) are stochastic search algorithms that take inspiration from evolutionary processes. 
-		\item Entropy is a generic term that means disorder. You can calculate it many different ways one method is shannonian information.
+		\item Entropy is a generic term that means disorder. One way of calculating it, used in information theory, is Shannon entropy.
 		\item We were motivated to do in depth analysis of genetic algorithms in order to understand their behavior better on a theoretical level.
 		\item Schrödinger's book, "What is Life", sparked a modern wave of interest in the study of thermodynamics and evolution together.
 	\end{itemize}
@@ -197,10 +197,10 @@ $$
 		\\
 		\medskip
 		\begin{itemize}
-			\item "Amount of information" contained within
-                          a variable.
-			\item In this case, the number of possible states an organism can be in
-			\item $p(x)$ is the occupancy of each state in the population
+			\item Shannon entropy contains the "amount of information" contained within
+                          the possible outcomes of a variable.
+			\item In this case, the number of possible states an organism can be in.
+			\item $p(x)$ is the occupancy of each state in the population.
 		\end{itemize}
 		\bigskip
 		See \emph{entropy\_simple\_example.py} for a simple
