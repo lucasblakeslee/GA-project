@@ -4,7 +4,7 @@
 % See the file LICENSE in this source distribution.
 
 %\documentclass[10pt,aspectratio=169]{beamer}
-\documentclass[handout,10pt]{beamer}
+\documentclass[handout,10pt,aspectratio=169]{beamer}
 
 \newcommand{\pitem}{\pause\item}
 
@@ -281,24 +281,16 @@ $$
       % Beamer doesn't like to display .eps files. This .png was
       % converted from .eps using Adobe Acrobat. The file graph1.png
       % should be in the same folder as the .tex file.
-      \includegraphics[width=\textwidth]{GA-gen-info_pid3095791.out.pdf}
-                      {\tiny
                       	\begin{singlespace}
-                      	 An example of evolution.  The top panel shows
-                         fitness as a function of generation for a
-                         ``$\sin()$ on top of gaussian'' fitness
-                         landscape.  The middle panel shows entropy,
-                         where you can see that the end point of the
-                         evolution has a lower entropy than earlier
-                         phases.
+                      	 An example of evolution. The top panel shows fitness as a function of generation for a "square-topped gaussian" fitness landscape. The middle panel shows entropy, where it's clear that the end points of evolution have lower entropy than earlier phases.
               			\end{singlespace}    
-              }
+
     \end{column}
 
     \begin{column}{0.6\textwidth}
      \includegraphics[width=\textwidth]{GA-gen-info_pid3027915.out.pdf}\\ {\tiny
       				\begin{singlespace}
-      				Another example of evolution that shows more clearly how
+      				An example of evolution that shows clearly how
       				the entropy reaches lower pleateaus with increased fitness.
       				\end{singlespace}	
       		}
