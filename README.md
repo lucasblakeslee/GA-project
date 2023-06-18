@@ -10,11 +10,11 @@ science and the conclusions.
 
 You can run an evolution by adjusting the values of `mate_func`,
 `initial_func`, and `fit_func` in the `main()` function of
-`GA-poly-max.py`
+`GA-func-max.py`
 
 Then you can run it with:
 
-`./GA-poly-max.py`
+`./GA-func-max.py`
 
 The output will tell you what your output file name will be, for
 example: `GA-gen-info_pid3554872.out`
